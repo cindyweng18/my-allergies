@@ -8,19 +8,13 @@ app.secret_key = os.getenv("SECRET_KEY", "fallback_secret_key")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    allergies = session.get("allergies", [])
     if request.method == "POST":
         allergies = request.form["allergies"].split(",") 
         allergies = [allergy.strip().lower() for allergy in allergies]
-        session["allergies"] = allergies 
+        session["allergies"] = allergies  
 
-        return redirect(url_for("allergy_list"))
-
-    return render_template("index.html")
-
-@app.route("/allergies")
-def allergy_list():
-    allergies = session.get("allergies", [])
-    return render_template("allergies.html", allergies=allergies)
+    return render_template("index.html", allergies=allergies)
 
 if __name__ == '__main__':
     app.run(debug=True)
