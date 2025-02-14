@@ -17,7 +17,7 @@
         <h2>Stored Allergies:</h2>
         <ul>
             {% for allergy in allergies %}
-                <li>{{ allergy }}</li>
+                <li>{{ allergy.name }}</li>
             {% endfor %}
         </ul>
     {% endif %}
