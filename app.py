@@ -21,8 +21,10 @@ def index():
 
         for allergy in allergies_list:
             if allergy:  
-                new_allergy = Allergy(name=allergy)
-                db.session.add(new_allergy)
+                existing_allergy = Allergy.query.filter_by(name=allergy).first()
+                if not existing_allergy: 
+                    new_allergy = Allergy(name=allergy)
+                    db.session.add(new_allergy)
         
         db.session.commit()
         return redirect(url_for("index"))  
