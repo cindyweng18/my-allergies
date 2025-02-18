@@ -3,3 +3,4 @@ venv/
 venv
 .env
 instance/allergies.db
+config.py
