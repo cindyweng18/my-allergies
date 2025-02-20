@@ -1,42 +1,50 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, request, render_template, redirect, url_for, flash
+from itsdangerous import SignatureExpired, BadSignature
+from extensions import serializer, mail
 from flask_mail import Message
-from flask_login import current_user
-from models import User, db
-from app import mail
+from models.database import User, db
+
 
 password_reset = Blueprint("password_reset", __name__)
 
-@password_reset.route("/reset_password", methods=["GET", "POST"])
+@password_reset.route("/reset", methods=["GET", "POST"])
 def reset_request():
     if request.method == "POST":
-        email = request.form["email"]
-        user = User.query.filter_by(email=email).first()
+        email = request.form.get("email")
+        user = User.query.filter_by(username=email).first()
+
         if user:
-            send_reset_email(user)
-            flash("Password reset email sent!", "info")
-            return redirect(url_for("auth.login"))
-        flash("Email not found.", "danger")
+            token = serializer.dumps(email, salt="password-reset-salt")
+            reset_url = url_for("password_reset.reset_token", token=token, _external=True)
+            
+            msg = Message("Password Reset Request", recipients=[email])
+            msg.body = f"Click the link to reset your password: {reset_url}"
+            mail.send(msg)
+
+            flash("Check your email for a password reset link.", "info")
+        else:
+            flash("No account found with that email.", "warning")
+
+        return redirect(url_for("auth.login"))
+
     return render_template("reset_request.html")
 
-def send_reset_email(user):
-    token = user.get_reset_token()
-    reset_url = url_for("password_reset.reset_token", token=token, _external=True)
-    msg = Message("Password Reset Request", recipients=[user.email])
-    msg.body = f"Click the link to reset your password: {reset_url}"
-    mail.send(msg)
-
-@password_reset.route("/reset_password/<token>", methods=["GET", "POST"])
+@password_reset.route("/reset/<token>", methods=["GET", "POST"])
 def reset_token(token):
-    user = User.verify_reset_token(token)
-    if not user:
+    try:
+        email = serializer.loads(token, salt="password-reset-salt", max_age=3600)
+    except:
         flash("Invalid or expired token.", "danger")
         return redirect(url_for("password_reset.reset_request"))
 
     if request.method == "POST":
-        password = request.form["password"]
-        user.set_password(password)
-        db.session.commit()
-        flash("Password has been reset!", "success")
-        return redirect(url_for("auth.login"))
+        new_password = request.form.get("password")
+        user = User.query.filter_by(username=email).first()
+
+        if user:
+            user.set_password(new_password)
+            db.session.commit()
+            flash("Your password has been updated!", "success")
+            return redirect(url_for("auth.login"))
 
     return render_template("reset_password.html")

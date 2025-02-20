@@ -1,17 +1,17 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
 from config import Config
-from models.database import db
+from extensions import db, mail, serializer
+from flask_login import LoginManager
+from models.database import User
 from routes.auth_routes import auth_bp
 from routes.allergy_routes import allergy_bp
 from routes.password_reset import password_reset
-from models.database import db, User
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
+mail.init_app(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
