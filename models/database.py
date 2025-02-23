@@ -2,9 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import secrets
 from datetime import datetime, timedelta
-
-db = SQLAlchemy()
-bcrypt = Bcrypt()
+from extensions import db, bcrypt
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
