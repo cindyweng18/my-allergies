@@ -11,14 +11,14 @@ def register():
         password = request.form["password"]
         if User.query.filter_by(username=username).first():
             flash("Username already exists!", "danger")
-            return redirect(url_for("auth.register"))
+            return redirect(url_for("auth.login"))
 
         user = User(username=username)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
         flash("Registration successful!", "success")
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("allergy.index"))
     return render_template("register.html")
 
 @auth_bp.route("/login", methods=["GET", "POST"])
