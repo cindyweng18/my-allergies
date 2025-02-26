@@ -30,6 +30,7 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             flash("Login successful!", "success")
+            print(url_for("allergy.index"))
             return redirect("/")
         else:
             flash("Invalid username or password.", "danger")

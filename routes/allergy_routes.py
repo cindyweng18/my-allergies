@@ -14,7 +14,7 @@ def index():
             allergy = Allergy(name=allergy_name, user_id=current_user.id)
             db.session.add(allergy)
             db.session.commit()
-        return redirect(url_for("allergy.index"))
+        return redirect("/")
 
     allergies = Allergy.query.filter_by(user_id=current_user.id).all()
     return render_template("index.html", allergies=allergies)

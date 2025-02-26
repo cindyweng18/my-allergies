@@ -3,8 +3,9 @@ from flask_bcrypt import Bcrypt
 import secrets
 from datetime import datetime, timedelta
 from extensions import db, bcrypt
+from flask_login import UserMixin
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
@@ -13,6 +14,10 @@ class User(db.Model):
     reset_token = db.Column(db.String(100), unique=True, nullable=True)
     reset_token_expiration = db.Column(db.DateTime, nullable=True)
 
+    @property
+    def is_active(self):
+        return True 
+    
     def set_password(self, password):
         self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 

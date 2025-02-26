@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, url_for
 from flask_migrate import Migrate
 from config import Config
 from extensions import db, mail, bcrypt 
@@ -8,6 +8,8 @@ from routes.auth_routes import auth_bp
 from routes.allergy_routes import allergy_bp
 from routes.password_reset import password_reset
 from itsdangerous import URLSafeTimedSerializer 
+
+
 
 def create_app():
     app = Flask(__name__)
