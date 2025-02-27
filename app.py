@@ -1,5 +1,6 @@
-from flask import Flask, url_for
+from flask import Flask
 from flask_migrate import Migrate
+from flask_cors import CORS
 from config import Config
 from extensions import db, mail, bcrypt 
 from flask_login import LoginManager
@@ -14,6 +15,7 @@ from itsdangerous import URLSafeTimedSerializer
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    CORS(app)
 
     db.init_app(app)
     migrate = Migrate(app, db)
