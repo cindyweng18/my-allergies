@@ -7,6 +7,9 @@ allergy_bp = Blueprint('allergy', __name__)
 @allergy_bp.route("/", methods=["GET", "POST"])
 @login_required
 def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
+    
     if request.method == "POST":
         allergy_name = request.form["allergies"].strip().lower()
         existing_allergy = Allergy.query.filter_by(name=allergy_name, user_id=current_user.id).first()
