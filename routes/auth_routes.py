@@ -30,10 +30,10 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             flash("Login successful!", "success")
-            # print(url_for("allergy.index"))
             return redirect(url_for("allergy.index"))
         else:
             flash("Invalid username or password.", "danger")
+            return redirect(url_for("auth.register"))
     return render_template("login.html")
 
 @auth_bp.route("/logout")
