@@ -27,14 +27,17 @@ def reset_request():
 
         return redirect(url_for("auth.login"))
 
-    return render_template("reset_request.html")
+    return render_template("reset_password.html")
 
-@password_reset.route("/reset/<token>", methods=["GET", "POST"])
+@password_reset.route("/reset_token/<token>", methods=["GET", "POST"])
 def reset_token(token):
     try:
         email = serializer.loads(token, salt="password-reset-salt", max_age=3600)
-    except:
-        flash("Invalid or expired token.", "danger")
+    except SignatureExpired:
+        flash("The token has expired.", "danger")
+        return redirect(url_for("password_reset.reset_request"))
+    except BadSignature:
+        flash("Invalid token.", "danger")
         return redirect(url_for("password_reset.reset_request"))
 
     if request.method == "POST":
@@ -48,3 +51,4 @@ def reset_token(token):
             return redirect(url_for("auth.login"))
 
     return render_template("reset_password.html")
+

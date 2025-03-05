@@ -34,8 +34,7 @@ def create_app():
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(allergy_bp, url_prefix="/allergy")
-    # app.register_blueprint(allergy_bp)
-    app.register_blueprint(password_reset)
+    app.register_blueprint(password_reset, url_prefix="/password")
 
     @app.route("/")
     def home():
