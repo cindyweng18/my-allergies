@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Allergy Input</h1>
-    <form action="/" method="POST">
+    <form action="{{ url_for('allergy.index') }}"  method="POST">
         <label for="allergies">Enter your allergies (comma-separated):</label>
         <input type="text" name="allergies" id="allergies" required>
         <button type="submit">Save</button>
@@ -19,8 +19,8 @@
             {% for allergy in allergies %}
                 <li>
                     {{ allergy.name }}
-                    <a href="{{ url_for('edit_allergy', allergy_id=allergy.id) }}">Edit</a>
-                    <a href="{{ url_for('delete_allergy', allergy_id=allergy.id) }}">Delete</a>
+                    <a href="{{ url_for('allergy.edit_allergy', allergy_id=allergy.id) }}">Edit</a>
+                    <a href="{{ url_for('allergy.delete_allergy', allergy_id=allergy.id) }}">Delete</a>
                 </li>
             {% endfor %}
         </ul>
