@@ -50,5 +50,4 @@ def reset_token(token):
             flash("Your password has been updated!", "success")
             return redirect(url_for("auth.login"))
 
-    return render_template("reset_password.html")
-
+    return render_template("reset_password.html", token=token)
