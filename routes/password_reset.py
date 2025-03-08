@@ -11,7 +11,7 @@ password_reset = Blueprint("password_reset", __name__)
 def reset_request():
     if request.method == "POST":
         email = request.form.get("email")
-        user = User.query.filter_by(username=email).first()
+        user = User.query.filter_by(email=email).first()  # Use email instead of username
 
         if user:
             token = serializer.dumps(email, salt="password-reset-salt")
@@ -27,7 +27,8 @@ def reset_request():
 
         return redirect(url_for("auth.login"))
 
-    return render_template("reset_password.html")
+    return render_template("reset_request.html")
+
 
 @password_reset.route("/reset_token/<token>", methods=["GET", "POST"])
 def reset_token(token):
@@ -35,19 +36,22 @@ def reset_token(token):
         email = serializer.loads(token, salt="password-reset-salt", max_age=3600)
     except SignatureExpired:
         flash("The token has expired.", "danger")
-        return redirect(url_for("password_reset.reset_request"))
+        return redirect(url_for("password_reset.reset"))
     except BadSignature:
         flash("Invalid token.", "danger")
-        return redirect(url_for("password_reset.reset_request"))
+        return redirect(url_for("password_reset.reset"))
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        flash("User not found.", "danger")
+        return redirect(url_for("password_reset.reset"))
 
     if request.method == "POST":
         new_password = request.form.get("password")
-        user = User.query.filter_by(username=email).first()
-
-        if user:
-            user.set_password(new_password)
-            db.session.commit()
-            flash("Your password has been updated!", "success")
-            return redirect(url_for("auth.login"))
+        user.set_password(new_password) 
+        db.session.commit()
+        flash("Your password has been updated!", "success")
+        return redirect(url_for("auth.login"))
 
     return render_template("reset_password.html", token=token)
