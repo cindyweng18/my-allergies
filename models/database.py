@@ -9,13 +9,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)  # Keep unique constraint
+    email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
+    UniqueConstraint('email', name='uq_user_email')
+    UniqueConstraint('username', name='uq_user_username')
     password_hash = db.Column(db.String(128), nullable=False)
     reset_token = db.Column(db.String(100), unique=True, nullable=True)
     reset_token_expiration = db.Column(db.DateTime, nullable=True)
-
-    __table_args__ = (UniqueConstraint('email', name='uq_user_email'),)
 
     @property
     def is_active(self):
@@ -41,5 +41,5 @@ class User(db.Model, UserMixin):
 class Allergy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name="fk_allergy_user_id"), nullable=False)
     user = db.relationship('User', backref=db.backref('allergies', lazy=True))
