@@ -18,7 +18,7 @@ def register():
             return redirect(url_for("auth.register"))
 
         hashed_password = generate_password_hash(password)
-        new_user = User(email=email, username=username, password=hashed_password)
+        new_user = User(email=email, username=username, password_hash=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
