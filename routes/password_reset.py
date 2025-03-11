@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 from itsdangerous import SignatureExpired, BadSignature
-from extensions import serializer, mail
+from extensions import mail, get_serializer
 from flask_mail import Message
 from models.database import User, db
 
@@ -14,6 +14,7 @@ def reset_request():
         user = User.query.filter_by(email=email).first()
 
         if user:
+            serializer = get_serializer()
             token = serializer.dumps(email, salt="password-reset-salt")
             reset_url = url_for("password_reset.reset_token", token=token, _external=True)
             
