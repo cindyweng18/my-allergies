@@ -34,6 +34,7 @@ def reset_request():
 @password_reset.route("/reset_token/<token>", methods=["GET", "POST"])
 def reset_token(token):
     try:
+        serializer = get_serializer()
         email = serializer.loads(token, salt="password-reset-salt", max_age=3600)
     except SignatureExpired:
         flash("The token has expired.", "danger")

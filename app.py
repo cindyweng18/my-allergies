@@ -20,6 +20,7 @@ def create_app():
     mail.init_app(app)
     bcrypt.init_app(app)
 
+
     # global serializer
     # serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
