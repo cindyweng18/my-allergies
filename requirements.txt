@@ -1,6 +1,8 @@
 alembic==1.14.1
 Flask==3.1.0
 Flask_Bcrypt==1.0.1
+Flask_Cors==4.0.1
+Flask_Cors==5.0.0
 Flask_Login==0.6.3
 flask_mail==0.10.0
 Flask_Migrate==4.1.0
@@ -8,3 +10,4 @@ flask_sqlalchemy==3.1.1
 itsdangerous==2.2.0
 SQLAlchemy==2.0.32
 SQLAlchemy==2.0.38
+Werkzeug==3.1.3
