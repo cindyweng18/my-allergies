@@ -39,12 +39,13 @@ def index():
 
             extracted_text = extract_text_from_pdf(file_path)
             allergens_list = [allergy.name for allergy in Allergy.query.filter_by(user_id=current_user.id).all()]
-            detected_allergens = find_allergens(extracted_text, allergens_list)
 
-            if detected_allergens:
-                flash(f"Found these allergens in the document: {', '.join(detected_allergens)}", "danger")
-            else:
-                flash("No known allergens found in the document.", "success")
+            # detected_allergens = find_allergens(extracted_text, allergens_list)
+
+            # if detected_allergens:
+            #     flash(f"Found these allergens in the document: {', '.join(detected_allergens)}", "danger")
+            # else:
+            #     flash("No known allergens found in the document.", "success")
 
             return redirect(url_for("allergy.index"))
 

@@ -1,4 +1,5 @@
 import fitz
+import re
 import os
 
 ALLOWED_EXTENSIONS = {"pdf"}
@@ -14,7 +15,7 @@ def extract_text_from_pdf(pdf_path):
         text += page.get_text("text") + "\n"
     return text
 
-def find_allergens(text, allergens_list):
-    """Checks if any allergens from the list appear in the extracted text."""
-    found_allergens = [allergen for allergen in allergens_list if allergen.lower() in text.lower()]
-    return found_allergens
+# def find_allergens(text, allergens_list):
+#     """Checks if any allergens from the list appear in the extracted text."""
+#     found_allergens = [allergen for allergen in allergens_list if allergen.lower() in text.lower()]
+#     return found_allergens
