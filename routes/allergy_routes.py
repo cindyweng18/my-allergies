@@ -1,9 +1,10 @@
+import os
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models.database import db, Allergy
-import os
 from werkzeug.utils import secure_filename
-from utils.pdf_processing import extract_text_from_pdf, find_allergens, allowed_file
+from utils.pdf_processing import extract_text_from_pdf, allowed_file
+from utils.ai_processing import extract_allergens
 
 allergy_bp = Blueprint('allergy', __name__)
 
@@ -38,7 +39,10 @@ def index():
             file.save(file_path)
 
             extracted_text = extract_text_from_pdf(file_path)
-            allergens_list = [allergy.name for allergy in Allergy.query.filter_by(user_id=current_user.id).all()]
+            found_allergens = extract_allergens(extracted_text)
+            flash(found_allergens)
+
+            # allergens_list = [allergy.name for allergy in Allergy.query.filter_by(user_id=current_user.id).all()]
 
             # detected_allergens = find_allergens(extracted_text, allergens_list)
 

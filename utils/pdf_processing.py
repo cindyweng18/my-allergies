@@ -8,11 +8,14 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def extract_text_from_pdf(pdf_path):
-    """Extracts text from a PDF file."""
-    doc = fitz.open(pdf_path)
+    """Extracts text from a given PDF file."""
     text = ""
-    for page in doc:
-        text += page.get_text("text") + "\n"
+    try:
+        with fitz.open(pdf_path) as doc:
+            for page in doc:
+                text += page.get_text("text") + "\n"
+    except Exception as e:
+        print("Error reading PDF:", e)
     return text
 
 # def find_allergens(text, allergens_list):

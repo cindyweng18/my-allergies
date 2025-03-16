@@ -1,12 +1,13 @@
 alembic==1.15.1
 fitz==0.0.1.dev2
 Flask==3.1.0
-flask_bcrypt==1.0.1
+Flask_Bcrypt==1.0.1
 flask_cors==5.0.1
-flask_login==0.6.3
+Flask_Login==0.6.3
 flask_mail==0.10.0
-flask_migrate==4.1.0
+Flask_Migrate==4.1.0
 flask_sqlalchemy==3.1.1
 itsdangerous==2.2.0
+protobuf==6.30.1
 SQLAlchemy==2.0.39
 Werkzeug==3.1.3
