@@ -7,27 +7,32 @@
 </head>
 <body>
     <h1>Allergy Input</h1>
-    <form method="POST" enctype="multipart/form-data">
+
+    <!-- Manual Allergy Input Form -->
+    <form method="POST">
         <label for="allergies">Add an allergy:</label>
         <input type="text" name="allergies" required>
         <button type="submit">Add</button>
     </form>
-    
+
+    <!-- File Upload Form (PDF & Images) -->
     <form method="POST" enctype="multipart/form-data">
-        <label for="pdf">Upload a PDF to scan for allergens:</label>
-        <input type="file" name="pdf" accept=".pdf">
+        <label for="file">Upload a PDF or Image to scan for allergens:</label>
+        <input type="file" name="file" accept=".pdf, .png, .jpg, .jpeg" required>
         <button type="submit">Upload & Scan</button>
     </form>
-    
-    {% for message in get_flashed_messages(with_categories=True) %}
-        <p class="{{ message[0] }}">{{ message[1] }}</p>
+
+    <!-- Flash Messages -->
+    {% for category, message in get_flashed_messages(with_categories=True) %}
+        <p class="{{ category }}">{{ message }}</p>
     {% endfor %}
-    
+
+    <!-- List of Detected Allergies -->
+    <h2>Detected Allergies</h2>
     <ul>
         {% for allergy in allergies %}
             <li>{{ allergy.name }}</li>
         {% endfor %}
     </ul>
-    
 </body>
 </html>
