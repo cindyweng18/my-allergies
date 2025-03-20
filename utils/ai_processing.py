@@ -15,14 +15,14 @@ def extract_allergens(text):
         print("Error processing text with Gemini:", e)
         return []
 
-def extract_text_from_image(image_path):
-    """Extracts text from an image using Google Gemini AI."""
-    with open(image_path, "rb") as img_file:
-        image_data = img_file.read()
+# def extract_text_from_image(image_path):
+#     """Extracts text from an image using Google Gemini AI."""
+#     with open(image_path, "rb") as img_file:
+#         image_data = img_file.read()
 
-    response = genai.generate_content(
-        model="gemini-pro-vision",
-        contents=[{"mime_type": "image/jpeg", "data": image_data}]
-    )
+#     model = genai.GenerativeModel("gemini-1.5-flash")
+#     response = model.generate_content(
+#         contents=[{"mime_type": "image/jpeg", "data": image_data}]
+#     )
 
-    return response.text.strip() if response.text else "No text found"
+#     return response.text.strip() if response.text else "No text found"
