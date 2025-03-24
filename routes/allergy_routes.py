@@ -49,11 +49,11 @@ def index():
 
             found_allergens = extract_allergens(extracted_text)
 
-            # for allergen in found_allergens:
-            #     if not Allergy.query.filter_by(name=allergen, user_id=current_user.id).first():
-            #         db.session.add(Allergy(name=allergen, user_id=current_user.id))
+            for allergen in found_allergens:
+                if not Allergy.query.filter_by(name=allergen, user_id=current_user.id).first():
+                    db.session.add(Allergy(name=allergen, user_id=current_user.id))
 
-            # db.session.commit()
+            db.session.commit()
             os.remove(file_path)
 
             flash(f"Detected Allergens: {', '.join(found_allergens)}", "success")
