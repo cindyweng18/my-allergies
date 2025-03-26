@@ -25,41 +25,47 @@ def index():
         return redirect(url_for("auth.login"))
 
     if request.method == "POST":
-        # Handle manual allergy input
+        # 1️⃣ Check for manual allergy input
         allergy_name = request.form.get("allergies", "").strip().lower()
         if allergy_name:
-            existing_allergy = Allergy.query.filter_by(name=allergy_name, user_id=current_user.id).first()
-            if not existing_allergy:
-                allergy = Allergy(name=allergy_name, user_id=current_user.id)
-                db.session.add(allergy)
+            if not Allergy.query.filter_by(name=allergy_name, user_id=current_user.id).first():
+                db.session.add(Allergy(name=allergy_name, user_id=current_user.id))
                 db.session.commit()
             return redirect(url_for("allergy.index"))
 
-        # Handle file upload (PDF or image)
+        # 2️⃣ Check for product name input
+        product_name = request.form.get("product_name", "").strip().lower()
+        if product_name:
+            user_allergies = [a.name for a in Allergy.query.filter_by(user_id=current_user.id).all()]
+            response = check_product_safety(product_name, user_allergies)
+
+            flash(response, "info")
+            return redirect(url_for("allergy.index"))
+
+        # 3️⃣ Check for file upload (PDF or Image)
         file = request.files.get("file")
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            file_path = os.path.join("uploads", filename)
             file.save(file_path)
 
-            if filename.endswith(".pdf"):
+            # Process file (PDF or Image)
+            if file.filename.endswith(".pdf"):
                 extracted_text = extract_text_from_pdf(file_path)
             else:
-                extracted_text = extract_text_from_image(file_path)
+                extracted_text = extract_text_from_image(file_path)  # OCR for images
 
             found_allergens = extract_allergens(extracted_text)
 
             for allergen in found_allergens:
                 if not Allergy.query.filter_by(name=allergen, user_id=current_user.id).first():
                     db.session.add(Allergy(name=allergen, user_id=current_user.id))
-
+            
             db.session.commit()
             os.remove(file_path)
 
             flash(f"Detected Allergens: {', '.join(found_allergens)}", "success")
-
             return redirect(url_for("allergy.index"))
 
     allergies = Allergy.query.filter_by(user_id=current_user.id).all()
     return render_template("index.html", allergies=allergies)
-

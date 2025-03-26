@@ -34,5 +34,11 @@
             <li>{{ allergy.name }}</li>
         {% endfor %}
     </ul>
+
+    <form method="POST">
+        <label for="product_name">Enter a product name:</label>
+        <input type="text" name="product_name" required>
+        <button type="submit">Check Product</button>
+    </form>
 </body>
 </html>

@@ -15,6 +15,24 @@ def extract_allergens(text):
         print("Error processing text with Gemini:", e)
         return []
 
+
+def check_product_safety(product_name, user_allergies):
+    """Uses AI to determine if a product contains allergens."""
+    try:
+        prompt = f"""
+        The user has the following allergies: {', '.join(user_allergies)}.
+        Check if the product '{product_name}' contains any of these allergens.
+        Respond with "Yes" if it's dangerous and list the allergens found.
+        Otherwise, respond with "No".
+        """
+
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt)
+
+        return response.text.strip()
+    except Exception as e:
+        return f"Error processing AI request: {str(e)}"
+
 # def extract_text_from_image(image_path):
 #     """Extracts text from an image using Google Gemini AI."""
 #     with open(image_path, "rb") as img_file:
