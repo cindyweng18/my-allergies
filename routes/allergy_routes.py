@@ -5,7 +5,7 @@ from models.database import db, Allergy
 from werkzeug.utils import secure_filename
 from utils.pdf_processing import extract_text_from_pdf
 from utils.image_processing import extract_text_from_image
-from utils.ai_processing import extract_allergens
+from utils.ai_processing import extract_allergens, check_product_safety
 
 allergy_bp = Blueprint("allergy", __name__)
 
@@ -25,7 +25,7 @@ def index():
         return redirect(url_for("auth.login"))
 
     if request.method == "POST":
-        # 1️⃣ Check for manual allergy input
+        # Check for manual allergy input
         allergy_name = request.form.get("allergies", "").strip().lower()
         if allergy_name:
             if not Allergy.query.filter_by(name=allergy_name, user_id=current_user.id).first():
@@ -33,7 +33,7 @@ def index():
                 db.session.commit()
             return redirect(url_for("allergy.index"))
 
-        # 2️⃣ Check for product name input
+        # Check for product name input
         product_name = request.form.get("product_name", "").strip().lower()
         if product_name:
             user_allergies = [a.name for a in Allergy.query.filter_by(user_id=current_user.id).all()]
@@ -42,7 +42,7 @@ def index():
             flash(response, "info")
             return redirect(url_for("allergy.index"))
 
-        # 3️⃣ Check for file upload (PDF or Image)
+        # Check for file upload (PDF or Image)
         file = request.files.get("file")
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
