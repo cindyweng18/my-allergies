@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, jsonify
 from flask_migrate import Migrate
 from flask_cors import CORS
 from config import Config
@@ -8,21 +8,16 @@ from models.database import User
 from routes.auth_routes import auth_bp
 from routes.allergy_routes import allergy_bp
 from routes.password_reset import password_reset
-from itsdangerous import URLSafeTimedSerializer 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    CORS(app)
+    CORS(app, supports_credentials=True) 
 
     db.init_app(app)
     migrate = Migrate(app, db)
     mail.init_app(app)
     bcrypt.init_app(app)
-
-
-    # global serializer
-    # serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
     login_manager = LoginManager(app)
     login_manager.init_app(app)
@@ -39,7 +34,7 @@ def create_app():
 
     @app.route("/")
     def home():
-        return redirect(url_for("allergy.index"))
+        return jsonify({"message": "Welcome to the Allergy Checker API"})
 
     return app
 
