@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_cors import CORS
 from config import Config
@@ -13,6 +14,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     CORS(app, supports_credentials=True) 
+    JWTManager(app)
 
     db.init_app(app)
     migrate = Migrate(app, db)
