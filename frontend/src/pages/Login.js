@@ -1,4 +1,5 @@
 import * as React from 'react';
+import axios from 'axios';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -60,6 +61,8 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function Login(props) {
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [usernameError, setUsernameError] = React.useState(false);
   const [userErrorMessage, setUserErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
@@ -79,15 +82,18 @@ export default function Login(props) {
       event.preventDefault();
       return;
     }
+    const data = new FormData(event.currentTarget);
+    setUsername(data.get('username'));
+    setPassword(data.get('password'));
     try {
       const response = await axios.post("http://127.0.0.1:5000/auth/login", {
         username,
         password,
       });
       localStorage.setItem("token", response.data.access_token); 
-      navigate("/dashboard"); 
+      console.log("success");
     } catch (error) {
-      setMessage("Invalid login credentials.");
+      console.log("Invalid login credentials.");
     }
   };
 
