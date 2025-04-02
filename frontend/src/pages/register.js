@@ -59,6 +59,8 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function Register(props) {
+  const [usernameError, setUsernameError] = React.useState(false);
+  const [userErrorMessage, setUserErrorMessage] = React.useState('');
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
@@ -71,6 +73,7 @@ export default function Register(props) {
     }
     try {
       const response = await axios.post("http://127.0.0.1:5000/auth/register", {
+        username,
         email,
         password,
       });
@@ -82,10 +85,19 @@ export default function Register(props) {
   };
 
   const validateInputs = () => {
+    const username = document.getElementById('username');
     const email = document.getElementById('email');
     const password = document.getElementById('password');
 
     let isValid = true;
+
+    if (!username.value) {
+      setUsernameError(true);
+      setUserErrorMessage('Please enter a valid username');
+    } else {
+      setUsernameError(false);
+      setUserErrorMessage('');
+    }
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
@@ -132,6 +144,23 @@ export default function Register(props) {
               gap: 2,
             }}
           >
+            <FormControl>
+              <FormLabel htmlFor="username">Username</FormLabel>
+              <TextField
+                error={usernameError}
+                helperText={userErrorMessage}
+                id="username"
+                type="string"
+                name="username"
+                placeholder="username"
+                autoComplete="username"
+                autoFocus
+                required
+                fullWidth
+                variant="outlined"
+                color={usernameError ? 'error' : 'primary'}
+              />
+            </FormControl>
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
