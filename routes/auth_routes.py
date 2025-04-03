@@ -7,6 +7,13 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
+    if not request.is_json:
+        return jsonify({"message": "Request must be JSON"}), 415
+    if not data:
+        return jsonify({"message": "No JSON data received"}), 400
+    if not username or not password:
+        return jsonify({"message": "Username and password are required"}), 400
+    
     data = request.get_json()
     email = data.get("email")
     username = data.get("username")
@@ -25,13 +32,22 @@ def register():
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
+    if not request.is_json:
+        return jsonify({"message": "Request must be JSON"}), 415
+
     data = request.get_json()
+    if not data:
+        return jsonify({"message": "No JSON data received"}), 400
+
     username = data.get("username")
     password = data.get("password")
 
+    if not username or not password:
+        return jsonify({"message": "Username and password are required"}), 400
+
     user = User.query.filter_by(username=username).first()
     if not user or not check_password_hash(user.password_hash, password):
-        return jsonify({"message": "Invalid username or password."}), 401
+        return jsonify({"message": "Invalid username or password"}), 401
 
     access_token = create_access_token(identity=user.id)
     return jsonify({"access_token": access_token, "message": "Login successful!"})
