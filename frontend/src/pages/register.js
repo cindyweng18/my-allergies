@@ -71,6 +71,7 @@ export default function Register(props) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
 
   const handleSubmit = async (event) => {
+    event.preventDefault();
     if (emailError || passwordError) {
       event.preventDefault();
       return;
@@ -82,10 +83,16 @@ export default function Register(props) {
 
     try {
       const response = await axios.post("http://127.0.0.1:5000/auth/register", {
-        username,
-        email,
-        password,
-      });
+        username: username,
+        email: email,
+        password: password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
       localStorage.setItem("token", response.data.access_token); 
       console.log("success");
       // navigate("/dashboard"); 

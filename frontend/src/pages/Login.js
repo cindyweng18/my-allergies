@@ -78,6 +78,7 @@ export default function Login(props) {
   };
 
   const handleSubmit = async (event) => {
+    event.preventDefault();
     if (usernameError || passwordError) {
       event.preventDefault();
       return;
@@ -87,9 +88,15 @@ export default function Login(props) {
     setPassword(data.get('password'));
     try {
       const response = await axios.post("http://127.0.0.1:5000/auth/login", {
-        username,
-        password,
-      });
+        username: username,
+        password: password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
       localStorage.setItem("token", response.data.access_token); 
       console.log("success");
     } catch (error) {
@@ -120,7 +127,7 @@ export default function Login(props) {
     //   setEmailErrorMessage('');
     // }
 
-    if (!password.value || password.value.length < 8) {
+    if (!password.value || password.value.length < 2) {
       setPasswordError(true);
       setPasswordErrorMessage('Password must be at least 8 characters long.');
       isValid = false;
