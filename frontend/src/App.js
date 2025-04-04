@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/dashboard";
 import Home from "./pages/home";
 import Register from "./pages/register";
+import AllergyChecker from "./pages/AllergyChecker";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/allergy" element={<AllergyChecker />} />
       </Routes>
     </Router>
   );
