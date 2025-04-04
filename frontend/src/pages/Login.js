@@ -17,6 +17,8 @@ import { styled } from '@mui/material/styles';
 // import ForgotPassword from './components/ForgotPassword';
 import AppTheme from '../theme';
 import ColorModeSelect from '../ColorModeSelect';
+import { useNavigate } from "react-router-dom";
+import { Alert, AlertTitle } from '@mui/material';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -61,12 +63,12 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function Login(props) {
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const navigate = useNavigate();
   const [usernameError, setUsernameError] = React.useState(false);
   const [userErrorMessage, setUserErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
+  const [loginError, setLoginError] = React.useState('');
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -84,12 +86,11 @@ export default function Login(props) {
       return;
     }
     const data = new FormData(event.currentTarget);
-    setUsername(data.get('username'));
-    setPassword(data.get('password'));
+
     try {
       const response = await axios.post("http://127.0.0.1:5000/auth/login", {
-        username: username,
-        password: password,
+        username: data.get('username'),
+        password: data.get('password'),
       },
       {
         headers: {
@@ -98,9 +99,14 @@ export default function Login(props) {
       }
     );
       localStorage.setItem("token", response.data.access_token); 
-      console.log("success");
+      navigate("/allergy");
     } catch (error) {
-      console.log("Invalid login credentials.");
+      setLoginError(
+        <Alert variant="filled" severity="error">
+          <AlertTitle>Error</AlertTitle>
+          Invalid Login Credentials. Please try again or register an account.
+        </Alert>
+      )
     }
   };
 
@@ -144,6 +150,7 @@ export default function Login(props) {
       <CssBaseline enableColorScheme />
       <SignInContainer direction="column" justifyContent="space-between">
         <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+        {loginError}
         <Card variant="outlined">
           <Typography
             component="h1"

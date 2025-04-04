@@ -16,6 +16,8 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from '../theme';
 import ColorModeSelect from '../ColorModeSelect';
+import { useNavigate } from "react-router-dom";
+import { Alert, AlertTitle } from '@mui/material';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -60,15 +62,14 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function Register(props) {
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [email, setEmail] = React.useState('');
+  const navigate = useNavigate();
   const [usernameError, setUsernameError] = React.useState(false);
   const [userErrorMessage, setUserErrorMessage] = React.useState('');
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
+  const [registerError, setRegisterError] = React.useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -77,15 +78,12 @@ export default function Register(props) {
       return;
     }
     const data = new FormData(event.currentTarget);
-    setUsername(data.get('username'));
-    setPassword(data.get('password'));
-    setEmail(data.get('email'));
 
     try {
       const response = await axios.post("http://127.0.0.1:5000/auth/register", {
-        username: username,
-        email: email,
-        password: password,
+        username: data.get('username'),
+        email: data.get('email'),
+        password: data.get('password'),
       },
       {
         headers: {
@@ -95,9 +93,14 @@ export default function Register(props) {
     );
       localStorage.setItem("token", response.data.access_token); 
       console.log("success");
-      // navigate("/dashboard"); 
+      navigate("/allergy"); 
     } catch (error) {
-      console.log("Invalid login credentials.");
+      setRegisterError(
+        <Alert variant="filled" severity="error">
+          <AlertTitle>Error</AlertTitle>
+          Invalid Login Credentials. Please try again or register an account.
+        </Alert>
+      )
     }
   };
 
