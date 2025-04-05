@@ -4,8 +4,10 @@ import { alpha, Box, CssBaseline, Stack, Typography } from "@mui/material";
 import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
 
 const AllergyChecker = (props) => {
+  const navigate = useNavigate();
   const [allergies, setAllergies] = useState([]);
   const [allergyInput, setAllergyInput] = useState("");
   const [productName, setProductName] = useState("");
@@ -25,6 +27,7 @@ const AllergyChecker = (props) => {
         setAllergies(response.data.allergies || []);
       } catch (error) {
         console.error("Error fetching allergies", error);
+        navigate('/')
       }
     };
 
