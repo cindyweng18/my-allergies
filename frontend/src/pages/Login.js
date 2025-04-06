@@ -119,19 +119,11 @@ export default function Login(props) {
     if (!username.value) {
       setUsernameError(true);
       setUserErrorMessage('Please enter a valid username');
+      isValid(false);
     } else {
       setUsernameError(false);
       setUserErrorMessage('');
     }
-
-    // if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-    //   setEmailError(true);
-    //   setEmailErrorMessage('Please enter a valid email address.');
-    //   isValid = false;
-    // } else {
-    //   setEmailError(false);
-    //   setEmailErrorMessage('');
-    // }
 
     if (!password.value || password.value.length < 2) {
       setPasswordError(true);
