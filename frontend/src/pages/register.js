@@ -62,7 +62,6 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function Register(props) {
-  // TODO: get email from localstorage, if there is an item, populate the email input field, otherwise, leave empty
   const navigate = useNavigate();
   const [usernameError, setUsernameError] = React.useState(false);
   const [userErrorMessage, setUserErrorMessage] = React.useState('');

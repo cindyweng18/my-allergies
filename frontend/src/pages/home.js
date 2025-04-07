@@ -37,7 +37,7 @@ function Home(props) {
 
   const handleSubmit = () => {
     if (validateInputs) {
-      localStorage.setItem("email", email);
+      // localStorage.setItem("email", email);
       navigate("/register")
     } else {
       setEmailError(true);
