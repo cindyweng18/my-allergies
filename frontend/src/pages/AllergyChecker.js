@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { alpha, Box, CssBaseline, Stack, Typography } from "@mui/material";
+import { alpha, Box, CssBaseline, Grid, Stack, Typography } from "@mui/material";
 import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
@@ -27,7 +27,7 @@ const AllergyChecker = (props) => {
         setAllergies(response.data.allergies || []);
       } catch (error) {
         console.error("Error fetching allergies", error);
-        navigate('/')
+        // navigate('/')
       }
     };
 
@@ -125,7 +125,14 @@ const AllergyChecker = (props) => {
             }}
           >
             <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
-
+            <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+              My Allergies
+            </Typography>
+            <Grid container spacing={2} columns={12}>
+              <Grid size={{ xs: 12, lg: 9 }}>
+                
+              </Grid>
+            </Grid>
             </Box>
           </Stack>
         </Box>
