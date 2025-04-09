@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { alpha, Box, CssBaseline, Grid, Stack, Typography } from "@mui/material";
+import { alpha, Box, Button, CssBaseline, List, ListItem, Paper, Stack, TextField, Typography } from "@mui/material";
 import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
@@ -124,16 +124,78 @@ const AllergyChecker = (props) => {
               mt: { xs: 8, md: 0 },
             }}
           >
-            <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
-            <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-              My Allergies
-            </Typography>
-            <Grid container spacing={2} columns={12}>
-              <Grid size={{ xs: 12, lg: 9 }}>
-                
-              </Grid>
-            </Grid>
-            </Box>
+            <Box p={4} maxWidth={600} mx="auto">
+      <Typography variant="h4" gutterBottom>
+        Allergy Checker
+      </Typography>
+        <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+          <form onSubmit={handleAddAllergy}>
+            <TextField
+              label="Enter an allergy"
+              value={allergyInput}
+              onChange={(e) => setAllergyInput(e.target.value)}
+              fullWidth
+              required
+              sx={{ mb: 2 }}
+            />
+            <Button variant="contained" type="submit">
+              Add Allergy
+            </Button>
+          </form>
+        </Paper>
+
+        <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+          <form onSubmit={handleFileUpload}>
+            <Button
+              variant="outlined"
+              component="label"
+              sx={{ mb: 2 }}
+            >
+              Upload File
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                hidden
+                onChange={(e) => setFile(e.target.files[0])}
+              />
+            </Button>
+            <Button variant="contained" type="submit" sx={{ ml: 2 }}>
+              Upload and Scan
+            </Button>
+          </form>
+          <Typography variant="body2" color="text.secondary" mt={1}>
+            {uploadMessage}
+          </Typography>
+        </Paper>
+
+        <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+          <form onSubmit={handleCheckProduct}>
+            <TextField
+              label="Check a product"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              fullWidth
+              required
+              sx={{ mb: 2 }}
+            />
+            <Button variant="contained" type="submit">
+              Check
+            </Button>
+          </form>
+          <Typography variant="body2" color="text.secondary" mt={1}>
+            {productMessage}
+          </Typography>
+        </Paper>
+
+        <Typography variant="h6" gutterBottom>
+          Your Allergies:
+        </Typography>
+        <List>
+          {allergies.map((a, idx) => (
+            <ListItem key={idx}>{a}</ListItem>
+          ))}
+        </List>
+      </Box>
           </Stack>
         </Box>
       </Box>
