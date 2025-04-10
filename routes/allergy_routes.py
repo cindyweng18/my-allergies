@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from utils.pdf_processing import extract_text_from_pdf
 from utils.image_processing import extract_text_from_image
 from utils.ai_processing import extract_allergens, check_product_safety
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 allergy_bp = Blueprint("allergy", __name__)
 
@@ -19,32 +20,33 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @allergy_bp.route("/", methods=["GET", "POST"])
-@login_required
+@jwt_required()
 def index():
+    user_id = get_jwt_identity()
+
     if request.method == "GET":
-        allergies = Allergy.query.filter_by(user_id=current_user.id).all()
+        allergies = Allergy.query.filter_by(user_id=user_id).all()
         return jsonify({"allergies": [allergy.name for allergy in allergies]})
 
     if request.method == "POST":
         data = request.json 
 
-        # Handle manual allergy input
         allergy_name = data.get("allergy", "").strip().lower()
         if allergy_name:
-            if not Allergy.query.filter_by(name=allergy_name, user_id=current_user.id).first():
-                db.session.add(Allergy(name=allergy_name, user_id=current_user.id))
+            if not Allergy.query.filter_by(name=allergy_name, user_id=user_id).first():
+                db.session.add(Allergy(name=allergy_name, user_id=user_id))
                 db.session.commit()
                 return jsonify({"message": "Allergy added successfully"}), 201
             return jsonify({"message": "Allergy already exists"}), 400
 
-        # Handle product safety check
         product_name = data.get("product_name", "").strip().lower()
         if product_name:
-            user_allergies = [a.name for a in Allergy.query.filter_by(user_id=current_user.id).all()]
+            user_allergies = [a.name for a in Allergy.query.filter_by(user_id=user_id).all()]
             response = check_product_safety(product_name, user_allergies)
             return jsonify({"message": response})
 
         return jsonify({"error": "Invalid request"}), 400
+
 
 @allergy_bp.route("/upload", methods=["POST"])
 @login_required

@@ -27,7 +27,7 @@ const AllergyChecker = (props) => {
         setAllergies(response.data.allergies || []);
       } catch (error) {
         console.error("Error fetching allergies", error);
-        // navigate('/')
+        navigate('/')
       }
     };
 
