@@ -14,7 +14,11 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     CORS(app, supports_credentials=True) 
-    JWTManager(app)
+    jwt = JWTManager(app)
+
+    @jwt.user_identity_loader
+    def user_identity_lookup(user_id):
+        return str(user_id)
 
     db.init_app(app)
     migrate = Migrate(app, db)
