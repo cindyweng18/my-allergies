@@ -19,10 +19,11 @@ const AllergyChecker = (props) => {
   useEffect(() => {
     const fetchAllergies = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/allergy", {
+        const response = await axios.get("http://127.0.0.1:5000/allergy/", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          withCredentials: true,
         });
         setAllergies(response.data.allergies || []);
       } catch (error) {
@@ -38,7 +39,7 @@ const AllergyChecker = (props) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/allergy",
+        "http://127.0.0.1:5000/allergy/",
         { allergy: allergyInput },
         {
           headers: {
@@ -58,7 +59,7 @@ const AllergyChecker = (props) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/allergy",
+        "http://127.0.0.1:5000/allergy/",
         { product_name: productName },
         {
           headers: {

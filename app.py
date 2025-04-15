@@ -13,7 +13,7 @@ from routes.password_reset import password_reset
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    CORS(app, supports_credentials=True) 
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
     jwt = JWTManager(app)
 
     @jwt.user_identity_loader
