@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { alpha, Box, Button, CssBaseline, List, ListItem, Paper, Stack, TextField, Typography } from "@mui/material";
+import { alpha, Box, Button, CssBaseline, Grid, List, ListItem, Paper, Stack, TextField, Typography } from "@mui/material";
 import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
@@ -125,10 +125,16 @@ const AllergyChecker = (props) => {
               mt: { xs: 8, md: 0 },
             }}
           >
-            <Box p={4} maxWidth={600} mx="auto">
+      <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       <Typography variant="h4" gutterBottom>
         Allergy Checker
       </Typography>
+      <Grid
+        container
+        spacing={2}
+        columns={12}
+        sx={{ mb: (theme) => theme.spacing(2) }}
+      >
         <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
           <form onSubmit={handleAddAllergy}>
             <TextField
@@ -188,14 +194,19 @@ const AllergyChecker = (props) => {
           </Typography>
         </Paper>
 
-        <Typography variant="h6" gutterBottom>
-          Your Allergies:
-        </Typography>
-        <List>
-          {allergies.map((a, idx) => (
-            <ListItem key={idx}>{a}</ListItem>
-          ))}
-        </List>
+          <Typography variant="h6" gutterBottom>
+            Your Allergies:
+          </Typography>
+          <Grid container spacing={2} columns={12}>
+            <Grid size={{ xs: 12, lg: 9 }}>
+              <List sx={{ listStyleType: 'disc' }}>
+                {allergies.map((a, idx) => (
+                  <ListItem key={idx} sx={{ display: 'list-item' }} >{a.charAt(0).toUpperCase() + a.slice(1)}</ListItem>
+                ))}
+              </List>
+            </Grid>
+          </Grid>
+        </Grid>
       </Box>
           </Stack>
         </Box>
