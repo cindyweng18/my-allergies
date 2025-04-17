@@ -103,112 +103,116 @@ const AllergyChecker = (props) => {
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
-      <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: "flex" }}>
         <SideMenu />
         <Navbar />
         <Box
           component="main"
-          sx={(theme) => ({
+          sx={{
             flexGrow: 1,
-            backgroundColor: theme.vars
-              ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
-              : alpha(theme.palette.background.default, 1),
-            overflow: 'auto',
-          })}
+            p: 4,
+            backgroundColor: (theme) =>
+              theme.palette.mode === "light" ? "#f5f5f5" : "#121212",
+          }}
         >
-          <Stack
-            spacing={2}
-            sx={{
-              alignItems: 'center',
-              mx: 3,
-              pb: 5,
-              mt: { xs: 8, md: 0 },
-            }}
-          >
-      <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
-      <Typography variant="h4" gutterBottom>
-        Allergy Checker
-      </Typography>
-      <Grid
-        container
-        spacing={2}
-        columns={12}
-        sx={{ mb: (theme) => theme.spacing(2) }}
-      >
-        <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
-          <form onSubmit={handleAddAllergy}>
-            <TextField
-              label="Enter an allergy"
-              value={allergyInput}
-              onChange={(e) => setAllergyInput(e.target.value)}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <Button variant="contained" type="submit">
-              Add Allergy
-            </Button>
-          </form>
-        </Paper>
-
-        <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
-          <form onSubmit={handleFileUpload}>
-            <Button
-              variant="outlined"
-              component="label"
-              sx={{ mb: 2 }}
-            >
-              Upload File
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                hidden
-                onChange={(e) => setFile(e.target.files[0])}
-              />
-            </Button>
-            <Button variant="contained" type="submit" sx={{ ml: 2 }}>
-              Upload and Scan
-            </Button>
-          </form>
-          <Typography variant="body2" color="text.secondary" mt={1}>
-            {uploadMessage}
+          <Typography variant="h4" gutterBottom>
+            Allergy Checker
           </Typography>
-        </Paper>
 
-        <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
-          <form onSubmit={handleCheckProduct}>
-            <TextField
-              label="Check a product"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-            />
-            <Button variant="contained" type="submit">
-              Check
-            </Button>
-          </form>
-          <Typography variant="body2" color="text.secondary" mt={1}>
-            {productMessage}
-          </Typography>
-        </Paper>
+          <Grid container spacing={3}>
+            {/* Add Allergy */}
+            <Grid item xs={12} md={6}>
+              <Paper elevation={3} sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Add an Allergy
+                </Typography>
+                <form onSubmit={handleAddAllergy}>
+                  <TextField
+                    label="Enter an allergy"
+                    value={allergyInput}
+                    onChange={(e) => setAllergyInput(e.target.value)}
+                    fullWidth
+                    required
+                    sx={{ mb: 2 }}
+                  />
+                  <Button fullWidth variant="contained" type="submit">
+                    Add Allergy
+                  </Button>
+                </form>
+              </Paper>
+            </Grid>
 
-          <Typography variant="h6" gutterBottom>
-            Your Allergies:
-          </Typography>
-          <Grid container spacing={2} columns={12}>
-            <Grid size={{ xs: 12, lg: 9 }}>
-              <List sx={{ listStyleType: 'disc' }}>
-                {allergies.map((a, idx) => (
-                  <ListItem key={idx} sx={{ display: 'list-item' }} >{a.charAt(0).toUpperCase() + a.slice(1)}</ListItem>
-                ))}
-              </List>
+            {/* Upload File */}
+            <Grid item xs={12} md={6}>
+              <Paper elevation={3} sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Upload a File
+                </Typography>
+                <form onSubmit={handleFileUpload}>
+                  <Button variant="outlined" component="label" fullWidth sx={{ mb: 2 }}>
+                    Choose File
+                    <input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      hidden
+                      onChange={(e) => setFile(e.target.files[0])}
+                    />
+                  </Button>
+                  <Button fullWidth variant="contained" type="submit">
+                    Upload and Scan
+                  </Button>
+                </form>
+                {uploadMessage && (
+                  <Typography variant="body2" color="text.secondary" mt={2}>
+                    {uploadMessage}
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
+
+            {/* Check Product */}
+            <Grid item xs={12} md={6}>
+              <Paper elevation={3} sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Check Product for Allergens
+                </Typography>
+                <form onSubmit={handleCheckProduct}>
+                  <TextField
+                    label="Enter product name"
+                    value={productName}
+                    onChange={(e) => setProductName(e.target.value)}
+                    fullWidth
+                    required
+                    sx={{ mb: 2 }}
+                  />
+                  <Button fullWidth variant="contained" type="submit">
+                    Check Product
+                  </Button>
+                </form>
+                {productMessage && (
+                  <Typography variant="body2" color="text.secondary" mt={2}>
+                    {productMessage}
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
+
+            {/* Allergy List */}
+            <Grid item xs={12} md={6}>
+              <Paper elevation={3} sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Your Allergies
+                </Typography>
+                <List dense>
+                  {allergies.map((a, idx) => (
+                    <ListItem key={idx} sx={{ listStyleType: 'disc', display: 'list-item' }}>
+                      {a.charAt(0).toUpperCase() + a.slice(1)}
+                    </ListItem>
+                  ))}
+                </List>
+              </Paper>
             </Grid>
           </Grid>
-        </Grid>
-      </Box>
-          </Stack>
         </Box>
       </Box>
     </AppTheme>
