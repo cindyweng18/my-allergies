@@ -7,17 +7,17 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
+    data = request.get_json()
+    email = data.get("email")
+    username = data.get("username")
+    password = data.get("password")
+
     if not request.is_json:
         return jsonify({"message": "Request must be JSON"}), 415
     if not data:
         return jsonify({"message": "No JSON data received"}), 400
     if not username or not password:
         return jsonify({"message": "Username and password are required"}), 400
-    
-    data = request.get_json()
-    email = data.get("email")
-    username = data.get("username")
-    password = data.get("password")
 
     existing_user = User.query.filter((User.email == email) | (User.username == username)).first()
     if existing_user:
