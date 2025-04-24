@@ -126,6 +126,9 @@ const AllergyChecker = (props) => {
                 <Typography variant="h6" gutterBottom>
                   Add an Allergy
                 </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Write down your allergies here to track them and check for reactions later.
+                </Typography>
                 <form onSubmit={handleAddAllergy}>
                   <TextField
                     label="Enter an allergy"
@@ -147,6 +150,9 @@ const AllergyChecker = (props) => {
               <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
                   Upload a File
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Upload a file such as an image or PDF of ingredients. Allergens will be extracted automatically.
                 </Typography>
                 <form onSubmit={handleFileUpload}>
                   <Button variant="outlined" component="label" fullWidth sx={{ mb: 2 }}>
@@ -175,6 +181,9 @@ const AllergyChecker = (props) => {
               <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
                   Check Product for Allergens
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Enter the name of a product or meal to see if it contains any of your listed allergies.
                 </Typography>
                 <form onSubmit={handleCheckProduct}>
                   <TextField
