@@ -212,13 +212,19 @@ const AllergyChecker = (props) => {
                 <Typography variant="h6" gutterBottom>
                   Your Allergies
                 </Typography>
-                <List dense>
-                  {allergies.map((a, idx) => (
-                    <ListItem key={idx} sx={{ listStyleType: 'disc', display: 'list-item' }}>
-                      {a.charAt(0).toUpperCase() + a.slice(1)}
-                    </ListItem>
-                  ))}
-                </List>
+                {allergies.length > 0 ? (
+                  <List dense>
+                    {allergies.map((a, idx) => (
+                      <ListItem key={idx} sx={{ listStyleType: 'disc', display: 'list-item' }}>
+                        {a.charAt(0).toUpperCase() + a.slice(1)}
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    No allergies added yet! Start with adding some or upload a file.
+                  </Typography>
+                )}
               </Paper>
             </Grid>
           </Grid>
