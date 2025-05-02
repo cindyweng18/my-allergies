@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { alpha, Box, Button, CssBaseline, Grid, List, ListItem, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, CssBaseline, Grid, List, ListItem, Paper, Snackbar, TextField, Typography } from "@mui/material";
 import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
@@ -14,6 +14,9 @@ const AllergyChecker = (props) => {
   const [productMessage, setProductMessage] = useState("");
   const [file, setFile] = useState(null);
   const [uploadMessage, setUploadMessage] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   // Fetch allergies on load
   useEffect(() => {
@@ -35,6 +38,12 @@ const AllergyChecker = (props) => {
     fetchAllergies();
   }, []);
 
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
   const handleAddAllergy = async (e) => {
     e.preventDefault();
     try {
@@ -50,6 +59,7 @@ const AllergyChecker = (props) => {
       );
       setAllergies([...allergies, allergyInput]);
       setAllergyInput("");
+      showSnackbar("Allergy added successfully!");
     } catch (err) {
       alert(err.response?.data?.message || "Error adding allergy");
     }
@@ -93,6 +103,7 @@ const AllergyChecker = (props) => {
           },
         }
       );
+      showSnackbar(response.data.message);
       setUploadMessage(response.data.message);
       setAllergies([...allergies, ...response.data.allergens]);
     } catch (err) {
@@ -230,6 +241,20 @@ const AllergyChecker = (props) => {
           </Grid>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </AppTheme>
   )
 };
