@@ -47,8 +47,7 @@ const AllergyChecker = (props) => {
   const handleAddAllergy = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:5000/allergy/",
+      const response = await axios.post("http://127.0.0.1:5000/allergy/add",
         { allergy: allergyInput },
         {
           headers: {
@@ -68,8 +67,7 @@ const AllergyChecker = (props) => {
   const handleCheckProduct = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:5000/allergy/",
+      const response = await axios.post("http://127.0.0.1:5000/allergy/check_product",
         { product_name: productName },
         {
           headers: {
