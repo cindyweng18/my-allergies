@@ -46,6 +46,13 @@ const AllergyChecker = (props) => {
 
   const handleAddAllergy = async (e) => {
     e.preventDefault();
+
+    const cleaned = allergyInput.trim().toLowerCase();
+    if (!cleaned || !/^[a-zA-Z\s\-]+$/.test(cleaned)) {
+      showSnackbar("Invalid allergy name (letters, spaces, and hyphens only)", "error");
+      return;
+    }
+
     try {
       const response = await axios.post("http://127.0.0.1:5000/allergy/add",
         { allergy: allergyInput },
@@ -66,6 +73,13 @@ const AllergyChecker = (props) => {
 
   const handleCheckProduct = async (e) => {
     e.preventDefault();
+
+    const cleaned = productName.trim().toLowerCase();
+    if (!cleaned || cleaned.length < 2) {
+      showSnackbar("Please enter a valid product name", "error");
+      return;
+    }
+    
     try {
       const response = await axios.post("http://127.0.0.1:5000/allergy/check_product",
         { product_name: productName },
