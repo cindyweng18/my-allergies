@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 const AllergyChecker = (props) => {
   const navigate = useNavigate();
   const [allergies, setAllergies] = useState([]);
+  const [newAllergens, setNewAllergens] = useState([]);
   const [allergyInput, setAllergyInput] = useState("");
   const [productName, setProductName] = useState("");
   const [productMessage, setProductMessage] = useState("");
@@ -64,6 +65,7 @@ const AllergyChecker = (props) => {
         }
       );
       setAllergies([...allergies, allergyInput]);
+      setTimeout(() => setNewAllergens([]), 3000);
       setAllergyInput("");
       showSnackbar("Allergy added successfully!");
     } catch (err) {
@@ -235,19 +237,21 @@ const AllergyChecker = (props) => {
                 <Typography variant="h6" gutterBottom>
                   Your Allergies
                 </Typography>
-                {allergies.length > 0 ? (
-                  <List dense>
-                    {allergies.map((a, idx) => (
-                      <ListItem key={idx} sx={{ listStyleType: 'disc', display: 'list-item' }}>
-                        {a.charAt(0).toUpperCase() + a.slice(1)}
-                      </ListItem>
-                    ))}
-                  </List>
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    No allergies added yet! Start with adding some or upload a file.
-                  </Typography>
-                )}
+                <List dense>
+                  {allergies.map((a, idx) => (
+                    <ListItem
+                      key={idx}
+                      sx={{
+                        listStyleType: 'disc',
+                        display: 'list-item',
+                        bgcolor: newAllergens.includes(a) ? 'rgba(100, 221, 23, 0.2)' : 'inherit',
+                        transition: 'background-color 0.5s ease-in-out',
+                      }}
+                    >
+                      {a.charAt(0).toUpperCase() + a.slice(1)}
+                    </ListItem>
+                  ))}
+                </List>
               </Paper>
             </Grid>
           </Grid>
