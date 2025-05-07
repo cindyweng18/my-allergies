@@ -5,6 +5,8 @@ import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const AllergyChecker = (props) => {
   const navigate = useNavigate();
@@ -125,6 +127,25 @@ const AllergyChecker = (props) => {
     }
   };
 
+  const handleDeleteAllergy = async (name) => {
+    try {
+      await axios.post(
+        "http://127.0.0.1:5000/allergy/delete",
+        { allergy: name },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setAllergies(allergies.filter((a) => a !== name));
+      showSnackbar(`Deleted "${name}"`, "success");
+    } catch (err) {
+      showSnackbar("Failed to delete allergy", "error");
+    }
+  };
+
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
@@ -238,19 +259,31 @@ const AllergyChecker = (props) => {
                   Your Allergies
                 </Typography>
                 <List dense>
-                  {allergies.map((a, idx) => (
-                    <ListItem
-                      key={idx}
-                      sx={{
-                        listStyleType: 'disc',
-                        display: 'list-item',
-                        bgcolor: newAllergens.includes(a) ? 'rgba(100, 221, 23, 0.2)' : 'inherit',
-                        transition: 'background-color 0.5s ease-in-out',
-                      }}
-                    >
-                      {a.charAt(0).toUpperCase() + a.slice(1)}
-                    </ListItem>
-                  ))}
+                  {allergies.map((a, idx) => {
+                    const isNew = newAllergens.includes(a);
+                    return (
+                      <ListItem
+                        key={idx}
+                        sx={{
+                          listStyleType: 'disc',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          bgcolor: isNew ? 'rgba(100, 221, 23, 0.2)' : 'inherit',
+                          transition: 'background-color 0.5s ease-in-out',
+                          borderRadius: 1,
+                          pl: 1,
+                        }}
+                      >
+                        <Typography>
+                          {a.charAt(0).toUpperCase() + a.slice(1)}
+                        </Typography>
+                        <IconButton edge="end" onClick={() => handleDeleteAllergy(a)}>
+                          <DeleteIcon color="error" />
+                        </IconButton>
+                      </ListItem>
+                    );
+                  })}
                 </List>
               </Paper>
             </Grid>
