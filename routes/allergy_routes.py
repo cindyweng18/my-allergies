@@ -43,24 +43,25 @@ def add_allergy():
     db.session.commit()
     return jsonify({"message": "Allergy added successfully"}), 201
 
-@allergy_bp.route("/delete", methods=["POST"])
+@allergy_bp.route("/delete_batch", methods=["POST"])
 @jwt_required()
-def delete_allergy():
+def delete_allergies():
     user_id = get_jwt_identity()
     data = request.get_json()
-    allergy_name = data.get("allergy", "").strip().lower()
+    allergies = data.get("allergies", [])
 
-    if not allergy_name:
-        return jsonify({"error": "Missing allergy name"}), 400
+    if not allergies or not isinstance(allergies, list):
+        return jsonify({"error": "Invalid allergy list"}), 400
 
-    allergy = Allergy.query.filter_by(name=allergy_name, user_id=user_id).first()
-    if not allergy:
-        return jsonify({"error": "Allergy not found"}), 404
+    deleted = []
+    for name in allergies:
+        allergy = Allergy.query.filter_by(name=name.strip().lower(), user_id=user_id).first()
+        if allergy:
+            db.session.delete(allergy)
+            deleted.append(name)
 
-    db.session.delete(allergy)
     db.session.commit()
-
-    return jsonify({"message": "Allergy deleted successfully"}), 200
+    return jsonify({"message": "Deleted", "deleted": deleted}), 200
 
 
 @allergy_bp.route("/check_product", methods=["POST"])

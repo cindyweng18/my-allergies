@@ -7,6 +7,8 @@ import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Checkbox from '@mui/material/Checkbox';
+
 
 const AllergyChecker = (props) => {
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ const AllergyChecker = (props) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [selectedAllergies, setSelectedAllergies] = useState([]);
 
   // Fetch allergies on load
   useEffect(() => {
@@ -146,6 +149,38 @@ const AllergyChecker = (props) => {
     }
   };
 
+  const toggleSelectAllergy = (name) => {
+    setSelectedAllergies((prev) =>
+      prev.includes(name)
+        ? prev.filter((a) => a !== name)
+        : [...prev, name]
+    );
+  };
+  
+  const handleBatchDelete = async () => {
+    if (selectedAllergies.length === 0) return;
+    if (!window.confirm(`Delete ${selectedAllergies.length} allerg${selectedAllergies.length > 1 ? 'ies' : 'y'}?`)) return;
+  
+    try {
+      await axios.post(
+        "http://127.0.0.1:5000/allergy/delete_batch",
+        { allergies: selectedAllergies },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setAllergies((prev) => prev.filter((a) => !selectedAllergies.includes(a)));
+      showSnackbar("Selected allergies deleted", "success");
+      setSelectedAllergies([]);
+    } catch (err) {
+      showSnackbar("Failed to delete selected allergies", "error");
+    }
+  };
+  
+
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
@@ -254,38 +289,61 @@ const AllergyChecker = (props) => {
 
             {/* Allergy List */}
             <Grid item xs={12} md={6}>
-              <Paper elevation={3} sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Your Allergies
+            <Paper elevation={3} sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Your Allergies
+              </Typography>
+              {allergies.length > 0 ? (
+                <>
+                  <List dense>
+                    {allergies.map((a, idx) => {
+                      const isNew = newAllergens.includes(a);
+                      const isSelected = selectedAllergies.includes(a);
+
+                      return (
+                        <ListItem
+                          key={idx}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            bgcolor: isNew ? 'rgba(100, 221, 23, 0.2)' : 'inherit',
+                            transition: 'background-color 0.5s ease-in-out',
+                            borderRadius: 1,
+                            pl: 1,
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                            <Checkbox
+                              checked={isSelected}
+                              onChange={() => toggleSelectAllergy(a)}
+                            />
+                            <Typography>
+                              {a.charAt(0).toUpperCase() + a.slice(1)}
+                            </Typography>
+                          </Box>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                  {selectedAllergies.length > 0 && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      fullWidth
+                      sx={{ mt: 2 }}
+                      onClick={handleBatchDelete}
+                    >
+                      Delete Selected ({selectedAllergies.length})
+                    </Button>
+                  )}
+                </>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  No allergies added yet! Start with adding some or upload a file.
                 </Typography>
-                <List dense>
-                  {allergies.map((a, idx) => {
-                    const isNew = newAllergens.includes(a);
-                    return (
-                      <ListItem
-                        key={idx}
-                        sx={{
-                          listStyleType: 'disc',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          bgcolor: isNew ? 'rgba(100, 221, 23, 0.2)' : 'inherit',
-                          transition: 'background-color 0.5s ease-in-out',
-                          borderRadius: 1,
-                          pl: 1,
-                        }}
-                      >
-                        <Typography>
-                          {a.charAt(0).toUpperCase() + a.slice(1)}
-                        </Typography>
-                        <IconButton edge="end" onClick={() => handleDeleteAllergy(a)}>
-                          <DeleteIcon color="error" />
-                        </IconButton>
-                      </ListItem>
-                    );
-                  })}
-                </List>
-              </Paper>
+              )}
+            </Paper>
             </Grid>
           </Grid>
         </Box>
