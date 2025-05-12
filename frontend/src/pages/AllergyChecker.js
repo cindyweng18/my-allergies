@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Alert, Box, Button, CssBaseline, Grid, List, ListItem, Paper, Snackbar, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CssBaseline,
+  Grid,
+  List,
+  ListItem,
+  Paper,
+  Snackbar,
+  TextField,
+  Typography,
+  Divider,
+  Checkbox,
+  IconButton,
+} from "@mui/material";
+import ColorModeSelect from "../ColorModeSelect";
 import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Checkbox from '@mui/material/Checkbox';
-
 
 const AllergyChecker = (props) => {
   const navigate = useNavigate();
@@ -24,7 +36,6 @@ const AllergyChecker = (props) => {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [selectedAllergies, setSelectedAllergies] = useState([]);
 
-  // Fetch allergies on load
   useEffect(() => {
     const fetchAllergies = async () => {
       try {
@@ -32,15 +43,13 @@ const AllergyChecker = (props) => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          withCredentials: true,
         });
         setAllergies(response.data.allergies || []);
       } catch (error) {
         console.error("Error fetching allergies", error);
-        navigate('/')
+        navigate("/");
       }
     };
-
     fetchAllergies();
   }, []);
 
@@ -52,318 +61,185 @@ const AllergyChecker = (props) => {
 
   const handleAddAllergy = async (e) => {
     e.preventDefault();
-
     const cleaned = allergyInput.trim().toLowerCase();
     if (!cleaned || !/^[a-zA-Z\s\-]+$/.test(cleaned)) {
-      showSnackbar("Invalid allergy name (letters, spaces, and hyphens only)", "error");
+      showSnackbar("Invalid allergy name.", "error");
       return;
     }
-
     try {
-      const response = await axios.post("http://127.0.0.1:5000/allergy/add",
-        { allergy: allergyInput },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setAllergies([...allergies, allergyInput]);
+      await axios.post("http://127.0.0.1:5000/allergy/add", { allergy: cleaned }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setAllergies((prev) => [...prev, cleaned]);
+      setNewAllergens([cleaned]);
       setTimeout(() => setNewAllergens([]), 3000);
       setAllergyInput("");
       showSnackbar("Allergy added successfully!");
     } catch (err) {
-      alert(err.response?.data?.message || "Error adding allergy");
+      showSnackbar("Error adding allergy.", "error");
     }
   };
 
   const handleCheckProduct = async (e) => {
     e.preventDefault();
-
     const cleaned = productName.trim().toLowerCase();
     if (!cleaned || cleaned.length < 2) {
-      showSnackbar("Please enter a valid product name", "error");
+      showSnackbar("Invalid product name.", "error");
       return;
     }
-    
     try {
-      const response = await axios.post("http://127.0.0.1:5000/allergy/check_product",
-        { product_name: productName },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axios.post("http://127.0.0.1:5000/allergy/check_product", { product_name: cleaned }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
       setProductMessage(response.data.message);
       setProductName("");
-    } catch (err) {
-      setProductMessage("Error checking product.");
+    } catch {
+      showSnackbar("Failed to check product.", "error");
     }
   };
 
   const handleFileUpload = async (e) => {
     e.preventDefault();
     if (!file) return;
-
     const formData = new FormData();
     formData.append("file", file);
-
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:5000/allergy/upload",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      showSnackbar(response.data.message);
+      const response = await axios.post("http://127.0.0.1:5000/allergy/upload", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setAllergies((prev) => [...prev, ...response.data.allergens]);
       setUploadMessage(response.data.message);
-      setAllergies([...allergies, ...response.data.allergens]);
-    } catch (err) {
-      setUploadMessage("Failed to upload file.");
-    }
-  };
-
-  const handleDeleteAllergy = async (name) => {
-    try {
-      await axios.post(
-        "http://127.0.0.1:5000/allergy/delete",
-        { allergy: name },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setAllergies(allergies.filter((a) => a !== name));
-      showSnackbar(`Deleted "${name}"`, "success");
-    } catch (err) {
-      showSnackbar("Failed to delete allergy", "error");
+      showSnackbar(response.data.message);
+    } catch {
+      showSnackbar("Failed to upload file.", "error");
     }
   };
 
   const toggleSelectAllergy = (name) => {
     setSelectedAllergies((prev) =>
-      prev.includes(name)
-        ? prev.filter((a) => a !== name)
-        : [...prev, name]
+      prev.includes(name) ? prev.filter((a) => a !== name) : [...prev, name]
     );
   };
-  
+
   const handleBatchDelete = async () => {
     if (selectedAllergies.length === 0) return;
-    if (!window.confirm(`Delete ${selectedAllergies.length} allerg${selectedAllergies.length > 1 ? 'ies' : 'y'}?`)) return;
-  
+    if (!window.confirm("Delete selected allergies?")) return;
     try {
-      await axios.post(
-        "http://127.0.0.1:5000/allergy/delete_batch",
-        { allergies: selectedAllergies },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.post("http://127.0.0.1:5000/allergy/delete_batch", { allergies: selectedAllergies }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
       setAllergies((prev) => prev.filter((a) => !selectedAllergies.includes(a)));
-      showSnackbar("Selected allergies deleted", "success");
       setSelectedAllergies([]);
-    } catch (err) {
-      showSnackbar("Failed to delete selected allergies", "error");
+      showSnackbar("Selected allergies deleted.");
+    } catch {
+      showSnackbar("Failed to delete allergies.", "error");
     }
   };
-  
 
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
-        <Box sx={{ display: "flex" }}>
+      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+      <Box sx={{ display: "flex" }}>
         <SideMenu />
         <Navbar />
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            p: 4,
-            backgroundColor: (theme) =>
-              theme.palette.mode === "light" ? "#f5f5f5" : "#121212",
-          }}
-        >
-          <Typography variant="h4" gutterBottom>
-            Allergy Checker
-          </Typography>
-
+        <Box component="main" sx={{ flexGrow: 1, p: 4 }}>
+          <Typography variant="h4" gutterBottom>Allergy Checker</Typography>
           <Grid container spacing={3}>
-            {/* Add Allergy */}
-            <Grid item xs={12} md={6}>
-              <Paper elevation={3} sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Add an Allergy
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Write down your allergies here to track them and check for reactions later.
-                </Typography>
+            <Grid item xs={12} md={8}>
+              <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h6">Add an Allergy</Typography>
                 <form onSubmit={handleAddAllergy}>
-                  <TextField
-                    label="Enter an allergy"
-                    value={allergyInput}
-                    onChange={(e) => setAllergyInput(e.target.value)}
-                    fullWidth
-                    required
-                    sx={{ mb: 2 }}
-                  />
-                  <Button fullWidth variant="contained" type="submit">
-                    Add Allergy
-                  </Button>
+                  <TextField label="Enter an allergy" value={allergyInput} onChange={(e) => setAllergyInput(e.target.value)} fullWidth required sx={{ mt: 2, mb: 2 }} />
+                  <Button fullWidth variant="contained" type="submit">Add Allergy</Button>
                 </form>
               </Paper>
-            </Grid>
 
-            {/* Upload File */}
-            <Grid item xs={12} md={6}>
-              <Paper elevation={3} sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Upload a File
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Upload a file such as an image or PDF of ingredients. Allergens will be extracted automatically.
-                </Typography>
+              <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h6">Upload a File</Typography>
                 <form onSubmit={handleFileUpload}>
-                  <Button variant="outlined" component="label" fullWidth sx={{ mb: 2 }}>
+                  <Button variant="outlined" component="label" fullWidth sx={{ mt: 2, mb: 2 }}>
                     Choose File
-                    <input
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      hidden
-                      onChange={(e) => setFile(e.target.files[0])}
-                    />
+                    <input type="file" accept=".pdf,.jpg,.jpeg,.png" hidden onChange={(e) => setFile(e.target.files[0])} />
                   </Button>
-                  <Button fullWidth variant="contained" type="submit">
-                    Upload and Scan
-                  </Button>
+                  <Button fullWidth variant="contained" type="submit">Upload and Scan</Button>
                 </form>
-                {uploadMessage && (
-                  <Typography variant="body2" color="text.secondary" mt={2}>
-                    {uploadMessage}
-                  </Typography>
-                )}
               </Paper>
-            </Grid>
 
-            {/* Check Product */}
-            <Grid item xs={12} md={6}>
               <Paper elevation={3} sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Check Product for Allergens
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Enter the name of a product or meal to see if it contains any of your listed allergies.
-                </Typography>
+                <Typography variant="h6">Check Product for Allergens</Typography>
                 <form onSubmit={handleCheckProduct}>
-                  <TextField
-                    label="Enter product name"
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    fullWidth
-                    required
-                    sx={{ mb: 2 }}
-                  />
-                  <Button fullWidth variant="contained" type="submit">
-                    Check Product
-                  </Button>
+                  <TextField label="Enter product name" value={productName} onChange={(e) => setProductName(e.target.value)} fullWidth required sx={{ mt: 2, mb: 2 }} />
+                  <Button fullWidth variant="contained" type="submit">Check Product</Button>
                 </form>
-                {productMessage && (
-                  <Typography variant="body2" color="text.secondary" mt={2}>
-                    {productMessage}
-                  </Typography>
-                )}
+                {productMessage && <Typography sx={{ mt: 2 }}>{productMessage}</Typography>}
               </Paper>
             </Grid>
 
-            {/* Allergy List */}
-            <Grid item xs={12} md={6}>
-            <Paper elevation={3} sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Your Allergies
-              </Typography>
-              {allergies.length > 0 ? (
-                <>
-                  <List dense>
-                    {allergies.map((a, idx) => {
-                      const isNew = newAllergens.includes(a);
-                      const isSelected = selectedAllergies.includes(a);
-
-                      return (
-                        <ListItem
-                          key={idx}
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            bgcolor: isNew ? 'rgba(100, 221, 23, 0.2)' : 'inherit',
-                            transition: 'background-color 0.5s ease-in-out',
-                            borderRadius: 1,
-                            pl: 1,
-                          }}
-                        >
-                          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-                            <Checkbox
-                              checked={isSelected}
-                              onChange={() => toggleSelectAllergy(a)}
-                            />
-                            <Typography>
-                              {a.charAt(0).toUpperCase() + a.slice(1)}
-                            </Typography>
-                          </Box>
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                  {selectedAllergies.length > 0 && (
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      fullWidth
-                      sx={{ mt: 2 }}
-                      onClick={handleBatchDelete}
-                    >
-                      Delete Selected ({selectedAllergies.length})
-                    </Button>
-                  )}
-                </>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  No allergies added yet! Start with adding some or upload a file.
-                </Typography>
-              )}
-            </Paper>
+            <Grid item xs={12} md={4}>
+              <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
+                <Typography variant="h6">Your Allergies</Typography>
+                {allergies.length > 0 ? (
+                  <>
+                    <List dense>
+                      {allergies.map((a, idx) => {
+                        const isNew = newAllergens.includes(a);
+                        const isSelected = selectedAllergies.includes(a);
+                        return (
+                          <ListItem
+                            key={idx}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              bgcolor: isNew ? 'rgba(100, 221, 23, 0.2)' : 'inherit',
+                              borderRadius: 1,
+                              transition: 'background-color 0.3s ease-in-out',
+                            }}
+                          >
+                            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                              <Checkbox checked={isSelected} onChange={() => toggleSelectAllergy(a)} />
+                              <Typography>{a.charAt(0).toUpperCase() + a.slice(1)}</Typography>
+                            </Box>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                    {selectedAllergies.length > 0 && (
+                      <Button variant="outlined" color="error" fullWidth sx={{ mt: 2 }} onClick={handleBatchDelete}>
+                        Delete Selected ({selectedAllergies.length})
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    No allergies added yet. Start by adding or uploading.
+                  </Typography>
+                )}
+              </Paper>
             </Grid>
           </Grid>
         </Box>
       </Box>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={4000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarSeverity}
-          sx={{ width: '100%' }}
-        >
+      <Snackbar open={snackbarOpen} autoHideDuration={4000} onClose={() => setSnackbarOpen(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
     </AppTheme>
-  )
+  );
 };
 
 export default AllergyChecker;
