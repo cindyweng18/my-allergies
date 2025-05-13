@@ -16,7 +16,7 @@ import {
   Checkbox,
   IconButton,
 } from "@mui/material";
-import ColorModeSelect from "../ColorModeSelect";
+import DeleteIcon from '@mui/icons-material/Delete';
 import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
@@ -35,6 +35,7 @@ const AllergyChecker = (props) => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [selectedAllergies, setSelectedAllergies] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchAllergies = async () => {
@@ -148,10 +149,13 @@ const AllergyChecker = (props) => {
     }
   };
 
+  const filteredAllergies = allergies.filter((a) =>
+    a.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
-      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <Box sx={{ display: "flex" }}>
         <SideMenu />
         <Navbar />
@@ -191,10 +195,19 @@ const AllergyChecker = (props) => {
             <Grid item xs={12} md={4}>
               <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
                 <Typography variant="h6">Your Allergies</Typography>
-                {allergies.length > 0 ? (
+                <TextField
+                  label="Search allergies"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  sx={{ my: 2 }}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {filteredAllergies.length > 0 ? (
                   <>
                     <List dense>
-                      {allergies.map((a, idx) => {
+                      {filteredAllergies.map((a, idx) => {
                         const isNew = newAllergens.includes(a);
                         const isSelected = selectedAllergies.includes(a);
                         return (
@@ -225,7 +238,7 @@ const AllergyChecker = (props) => {
                   </>
                 ) : (
                   <Typography variant="body2" color="text.secondary">
-                    No allergies added yet. Start by adding or uploading.
+                    {searchTerm ? "No matching allergies found." : "No allergies added yet. Start by adding or uploading."}
                   </Typography>
                 )}
               </Paper>
