@@ -16,7 +16,8 @@ import {
   Checkbox,
   IconButton,
 } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
+import InputAdornment from "@mui/material/InputAdornment";
+import ClearIcon from '@mui/icons-material/Clear';
 import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
@@ -195,6 +196,24 @@ const AllergyChecker = (props) => {
             <Grid item xs={12} md={4}>
               <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
                 <Typography variant="h6">Your Allergies</Typography>
+                <TextField
+                  label="Search allergies"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  sx={{ my: 2 }}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    endAdornment: searchTerm && (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setSearchTerm("")} edge="end">
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
                 <TextField
                   label="Search allergies"
                   variant="outlined"
