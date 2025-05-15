@@ -9,6 +9,7 @@ from models.database import User
 from routes.auth_routes import auth_bp
 from routes.allergy_routes import allergy_bp
 from routes.password_reset import password_reset
+from routes.user import user_bp
 
 def create_app():
     app = Flask(__name__)
@@ -37,6 +38,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(allergy_bp, url_prefix="/allergy")
     app.register_blueprint(password_reset, url_prefix="/password")
+    app.register_blueprint(user_bp, url_prefix="/user")
 
     @app.route("/")
     def home():
