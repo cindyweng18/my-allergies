@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import MuiDrawer, { drawerClasses } from '@mui/material/Drawer';
@@ -40,6 +42,25 @@ const mainListItems = [
   ];
 
 export default function SideMenu() {
+  const [profile, setProfile] = useState({ username: '', email: '' });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:5000/user/profile", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        setProfile(response.data);
+      } catch (err) {
+        console.error("Failed to fetch profile info", err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   return (
     <Drawer
       variant="permanent"
@@ -98,12 +119,12 @@ export default function SideMenu() {
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
-          <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            Riley Carter
-          </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            riley@email.com
-          </Typography>
+        <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
+          {profile.username || "User"}
+        </Typography>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          {profile.email || "email@example.com"}
+        </Typography>
         </Box>
         <OptionsMenu />
       </Stack>
