@@ -17,6 +17,7 @@ import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
 import OptionsMenu from './OptionsMenu.js';
+import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -43,6 +44,7 @@ const mainListItems = [
 
 export default function SideMenu() {
   const [profile, setProfile] = useState({ username: '', email: '' });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -104,27 +106,30 @@ export default function SideMenu() {
       </Box>
       <Stack
         direction="row"
+        onClick={() => navigate('/settings')}
         sx={{
           p: 2,
           gap: 1,
           alignItems: 'center',
           borderTop: '1px solid',
           borderColor: 'divider',
+          cursor: 'pointer',
+          '&:hover': { backgroundColor: 'action.hover' }
         }}
       >
         <Avatar
           sizes="small"
-          alt="Riley Carter"
+          alt={profile.username}
           src="/static/images/avatar/7.jpg"
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
-        <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-          {profile.username || "User"}
-        </Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          {profile.email || "email@example.com"}
-        </Typography>
+          <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
+            {profile.username || "User"}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            {profile.email || "email@example.com"}
+          </Typography>
         </Box>
         <OptionsMenu />
       </Stack>
