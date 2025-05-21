@@ -11,7 +11,7 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import MenuButton from './MenuButton';
 import { useNavigate } from 'react-router-dom';
-import { ListItemButton } from '@mui/material';
+import { ListItemButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 
 const MenuItem = styled(MuiMenuItem)({
   margin: '2px 0',
@@ -19,13 +19,15 @@ const MenuItem = styled(MuiMenuItem)({
 
 export default function OptionsMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [logoutDialogOpen, setLogoutDialogOpen] = React.useState(false);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogoutConfirm = () => {
     localStorage.removeItem('accessToken');
+    setLogoutDialogOpen(false);
     navigate('/login');
-  }
+  };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -37,7 +39,16 @@ export default function OptionsMenu() {
 
   const handleEditProfile = () => {
     handleClose();
-    navigate('/editprofile');
+    navigate('/settings');
+  };
+
+  const handleLogoutPrompt = () => {
+    handleClose();
+    setLogoutDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setLogoutDialogOpen(false);
   };
 
   return(
@@ -72,7 +83,7 @@ export default function OptionsMenu() {
         <MenuItem onClick={handleEditProfile}>Edit Profile</MenuItem>
         <Divider />
         <MenuItem
-          onClick={handleClose}
+          onClick={handleLogoutPrompt}
           sx={{
             [`& .${listItemIconClasses.root}`]: {
               ml: 'auto',
@@ -80,7 +91,7 @@ export default function OptionsMenu() {
             },
           }}
         >
-          <ListItemButton onClick={handleLogout}>
+          <ListItemButton>
             <ListItemText>Logout</ListItemText>
             <ListItemIcon>
               <LogoutRoundedIcon fontSize="small" />
@@ -88,6 +99,26 @@ export default function OptionsMenu() {
           </ListItemButton>
         </MenuItem>
       </Menu>
+
+      <Dialog
+        open={logoutDialogOpen}
+        onClose={handleDialogClose}
+        aria-labelledby="logout-dialog-title"
+        aria-describedby="logout-dialog-description"
+      >
+        <DialogTitle id="logout-dialog-title">Confirm Logout</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="logout-dialog-description">
+            Are you sure you want to log out?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleLogoutConfirm} color="error" autoFocus>
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   );
 }
