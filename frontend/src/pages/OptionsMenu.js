@@ -30,10 +30,15 @@ export default function OptionsMenu() {
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+  const handleEditProfile = () => {
+    handleClose();
+    navigate('/editprofile');
+  };
 
   return(
     <React.Fragment>
@@ -64,8 +69,7 @@ export default function OptionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>Settings</MenuItem>
+        <MenuItem onClick={handleEditProfile}>Edit Profile</MenuItem>
         <Divider />
         <MenuItem
           onClick={handleClose}
@@ -79,8 +83,8 @@ export default function OptionsMenu() {
           <ListItemButton onClick={handleLogout}>
             <ListItemText>Logout</ListItemText>
             <ListItemIcon>
-            <LogoutRoundedIcon fontSize="small" />
-          </ListItemIcon>
+              <LogoutRoundedIcon fontSize="small" />
+            </ListItemIcon>
           </ListItemButton>
         </MenuItem>
       </Menu>

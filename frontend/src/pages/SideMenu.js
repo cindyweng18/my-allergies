@@ -106,7 +106,7 @@ export default function SideMenu() {
       </Box>
       <Stack
         direction="row"
-        onClick={() => navigate('/settings')}
+        onClick={() => navigate('/editprofile')}
         sx={{
           p: 2,
           gap: 1,
