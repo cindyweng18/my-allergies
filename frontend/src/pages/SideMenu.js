@@ -33,8 +33,8 @@ const Drawer = styled(MuiDrawer)({
 });
 
 const mainListItems = [
-    { text: 'Home', icon: <HomeRoundedIcon /> },,
-  ];
+  { text: 'Home', icon: <HomeRoundedIcon />, route: '/allergy' },
+];
   
   const secondaryListItems = [
     { text: 'Settings', icon: <SettingsRoundedIcon /> },
@@ -85,7 +85,7 @@ export default function SideMenu() {
                 <List dense>
                     {mainListItems.map((item, index) => (
                     <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-                        <ListItemButton selected={index === 0}>
+                        <ListItemButton onClick={() => navigate(item.route)} selected={index === 0}>
                         <ListItemIcon>{item.icon}</ListItemIcon>
                         <ListItemText primary={item.text} />
                         </ListItemButton>

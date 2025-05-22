@@ -39,7 +39,7 @@ export default function OptionsMenu() {
 
   const handleEditProfile = () => {
     handleClose();
-    navigate('/settings');
+    navigate('/editprofile');
   };
 
   const handleLogoutPrompt = () => {

@@ -15,6 +15,7 @@ import {
   Divider,
   Checkbox,
   IconButton,
+  Collapse,
 } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import ClearIcon from '@mui/icons-material/Clear';
@@ -189,7 +190,13 @@ const AllergyChecker = (props) => {
                   <TextField label="Enter product name" value={productName} onChange={(e) => setProductName(e.target.value)} fullWidth required sx={{ mt: 2, mb: 2 }} />
                   <Button fullWidth variant="contained" type="submit">Check Product</Button>
                 </form>
-                {productMessage && <Typography sx={{ mt: 2 }}>{productMessage}</Typography>}
+                <Paper elevation={2} sx={{ mt: 2, p: 2, backgroundColor: '#fdfdfd' }}>
+                <Collapse in={!!productMessage}>
+                  <Alert severity="info" sx={{ mt: 2 }}>
+                    {productMessage}
+                  </Alert>
+                </Collapse>
+              </Paper>
               </Paper>
             </Grid>
 
@@ -213,15 +220,6 @@ const AllergyChecker = (props) => {
                       </InputAdornment>
                     )
                   }}
-                />
-                <TextField
-                  label="Search allergies"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ my: 2 }}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 {filteredAllergies.length > 0 ? (
                   <>

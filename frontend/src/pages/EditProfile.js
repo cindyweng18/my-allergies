@@ -9,6 +9,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import SideMenu from "./SideMenu";
 
 export default function EditProfile() {
   const [username, setUsername] = useState("");
@@ -63,6 +64,8 @@ export default function EditProfile() {
   };
 
   return (
+    <>
+    <SideMenu />
     <Paper elevation={3} sx={{ p: 4, maxWidth: 500, mx: "auto", mt: 6 }}>
       <Typography variant="h5" gutterBottom>
         Edit Profile
@@ -110,5 +113,6 @@ export default function EditProfile() {
         </Alert>
       </Snackbar>
     </Paper>
+    </>
   );
 }
