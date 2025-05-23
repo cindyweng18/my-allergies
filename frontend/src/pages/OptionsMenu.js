@@ -24,9 +24,11 @@ export default function OptionsMenu() {
   const navigate = useNavigate();
 
   const handleLogoutConfirm = () => {
-    localStorage.removeItem('accessToken');
+    localStorage.removeItem('token');
     setLogoutDialogOpen(false);
-    navigate('/login');
+    setTimeout(() => {
+      navigate('/');
+    }, 50);
   };
 
   const handleClick = (event) => {
