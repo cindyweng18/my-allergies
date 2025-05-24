@@ -5,6 +5,7 @@ import Home from "./pages/home";
 import Register from "./pages/register";
 import AllergyChecker from "./pages/AllergyChecker";
 import EditProfile from "./pages/EditProfile";
+import AboutPage from "./pages/About";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/allergy" element={<AllergyChecker />} />
         <Route path="/editprofile" element={<EditProfile />} />
+        <Route path="/about" element={<AboutPage />} />
       </Routes>
     </Router>
   );
