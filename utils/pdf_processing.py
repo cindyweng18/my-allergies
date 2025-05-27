@@ -18,7 +18,19 @@ def extract_text_from_pdf(pdf_path):
         print("Error reading PDF:", e)
     return text
 
-# def find_allergens(text, allergens_list):
-#     """Checks if any allergens from the list appear in the extracted text."""
-#     found_allergens = [allergen for allergen in allergens_list if allergen.lower() in text.lower()]
-#     return found_allergens
+def extract_allergens(text):
+    lines = text.splitlines()
+    allergens = set()
+
+    for line in lines:
+        clean_line = line.strip().lower()
+        if len(clean_line) < 3 or any(char.isdigit() for char in clean_line):
+            continue
+
+        match = re.match(r'(allergy|tested|positive|negative)?[:\-\s]*([a-zA-Z\s]{3,})', clean_line)
+        if match:
+            possible = match.group(2).strip()
+            if len(possible.split()) <= 3: 
+                allergens.add(possible)
+
+    return list(allergens)

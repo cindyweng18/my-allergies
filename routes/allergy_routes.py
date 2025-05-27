@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 from models.database import db, Allergy
-from utils.pdf_processing import extract_text_from_pdf
+from utils.pdf_processing import extract_text_from_pdf, extract_allergens
 from utils.image_processing import extract_text_from_image
 from utils.ai_processing import extract_allergens, check_product_safety
 
@@ -101,43 +101,21 @@ def check_product():
 @allergy_bp.route("/upload", methods=["POST"])
 @jwt_required()
 def upload_file():
-    user_id = get_jwt_identity()
-
     if "file" not in request.files:
-        return jsonify({"message": "No file uploaded"}), 400
+        return jsonify({"message": "No file part"}), 400
 
     file = request.files["file"]
-    if file.filename == "" or not allowed_file(file.filename):
-        return jsonify({"message": "Invalid file format"}), 400
+    if file.filename == "":
+        return jsonify({"message": "No selected file"}), 400
 
-    filename = secure_filename(file.filename)
-    file_path = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(file_path)
-
-    # Extract text from file
     try:
-        if file.filename.lower().endswith(".pdf"):
-            extracted_text = extract_text_from_pdf(file_path)
-        else:
-            extracted_text = extract_text_from_image(file_path)
+        text = extract_text_from_pdf(file) 
+        possible_allergens = extract_allergens(text) 
+
+        return jsonify({
+            "allergens": possible_allergens,
+            "message": "Select only the allergies you actually have."
+        }), 200
+
     except Exception as e:
-        os.remove(file_path)
-        return jsonify({"error": "Failed to process file", "details": str(e)}), 500
-
-    os.remove(file_path)
-
-    # Extract allergens using AI
-    found_allergens = extract_allergens(extracted_text)
-    new_allergens = []
-
-    for allergen in found_allergens:
-        if not Allergy.query.filter_by(name=allergen, user_id=user_id).first():
-            db.session.add(Allergy(name=allergen, user_id=user_id))
-            new_allergens.append(allergen)
-
-    db.session.commit()
-
-    if not found_allergens:
-        return jsonify({"message": "No allergens found in file"}), 204
-
-    return jsonify({"message": "File processed successfully", "allergens": new_allergens}), 201
+        return jsonify({"message": f"Error processing file: {str(e)}"}), 500
