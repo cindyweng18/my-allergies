@@ -6,6 +6,9 @@ from models.database import db, Allergy
 from utils.pdf_processing import extract_text_from_pdf, extract_allergens
 from utils.image_processing import extract_text_from_image
 from utils.ai_processing import extract_allergens, check_product_safety
+from models.database import User
+from extensions import db
+
 
 allergy_bp = Blueprint("allergy", __name__)
 
@@ -119,3 +122,21 @@ def upload_file():
 
     except Exception as e:
         return jsonify({"message": f"Error processing file: {str(e)}"}), 500
+
+@allergy_bp.route("/save", methods=["POST"])
+@jwt_required()
+def save_selected_allergies():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    selected_allergies = data.get("allergies", [])
+
+    if not selected_allergies:
+        return jsonify({"message": "No allergies submitted"}), 400
+
+    user = User.query.get(user_id)
+    for a in selected_allergies:
+        if a not in user.allergies:
+            user.allergies.append(a)
+
+    db.session.commit()
+    return jsonify({"message": "Allergies saved successfully."}), 200
