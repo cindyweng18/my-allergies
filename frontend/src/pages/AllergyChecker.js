@@ -23,6 +23,7 @@ import AppTheme from "../theme";
 import SideMenu from "./SideMenu";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
+import SelectAllergens from "./SelectAllergies";
 
 const AllergyChecker = (props) => {
   const navigate = useNavigate();
@@ -199,6 +200,13 @@ const handleConfirmAllergens = async (selectedAllergens) => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      <SelectAllergens
+        open={modalOpen}
+        allergens={uploadAllergens}
+        onClose={() => setModalOpen(false)}
+        onConfirm={handleConfirmAllergens}
+      />
     </AppTheme>
   );
 };
