@@ -140,3 +140,33 @@ def save_selected_allergies():
 
     db.session.commit()
     return jsonify({"message": "Allergies saved successfully."}), 200
+
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from models.database import User
+from extensions import db
+
+allergy_bp = Blueprint("allergy", __name__)
+
+@allergy_bp.route("/add_batch", methods=["POST"])
+@jwt_required()
+def add_batch_allergies():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    new_allergies = data.get("allergies", [])
+
+    if not new_allergies:
+        return jsonify({"message": "No allergies provided"}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    added = []
+    for allergy in new_allergies:
+        if allergy not in user.allergies:
+            user.allergies.append(allergy)
+            added.append(allergy)
+
+    db.session.commit()
+    return jsonify({"message": "Batch allergies added", "added": added}), 200

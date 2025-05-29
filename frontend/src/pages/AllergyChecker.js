@@ -27,19 +27,14 @@ import { useNavigate } from "react-router-dom";
 const AllergyChecker = (props) => {
   const navigate = useNavigate();
   const [allergies, setAllergies] = useState([]);
-  const [newAllergens, setNewAllergens] = useState([]);
-  const [allergyInput, setAllergyInput] = useState("");
-  const [productName, setProductName] = useState("");
-  const [productMessage, setProductMessage] = useState("");
-  const [file, setFile] = useState(null);
-  const [uploadMessage, setUploadMessage] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const [selectedAllergies, setSelectedAllergies] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingAllergy, setEditingAllergy] = useState(null);
   const [editedValue, setEditedValue] = useState("");
+  const [uploadAllergens, setUploadAllergens] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchAllergies = async () => {
@@ -91,6 +86,48 @@ const AllergyChecker = (props) => {
       showSnackbar("Failed to update allergy", "error");
     }
   };
+
+  const handleFileUpload = async (e) => {
+  e.preventDefault();
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await axios.post("http://127.0.0.1:5000/allergy/upload", formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    setUploadAllergens(response.data.allergens);
+    setModalOpen(true);
+  } catch {
+    showSnackbar("Failed to upload file.", "error");
+  }
+};
+
+const handleConfirmAllergens = async (selectedAllergens) => {
+  try {
+    await axios.post("http://127.0.0.1:5000/allergy/add_batch", {
+      allergies: selectedAllergens
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+    setAllergies((prev) => [...prev, ...selectedAllergens]);
+    showSnackbar("Selected allergies added!");
+  } catch {
+    showSnackbar("Error saving selected allergens.", "error");
+  } finally {
+    setModalOpen(false);
+    setUploadAllergens([]);
+  }
+};
 
   const filteredAllergies = allergies.filter((a) =>
     a.toLowerCase().includes(searchTerm.toLowerCase())
