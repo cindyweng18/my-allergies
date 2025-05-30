@@ -1,4 +1,4 @@
-import os
+import os, re
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
@@ -20,6 +20,9 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def is_valid_allergen(name):
+    return bool(re.match(r"^[a-zA-Z\s\-]{2,50}$", name.strip()))
 
 @allergy_bp.route("/", methods=["GET"])
 @jwt_required()
@@ -153,20 +156,32 @@ allergy_bp = Blueprint("allergy", __name__)
 def add_batch_allergies():
     user_id = get_jwt_identity()
     data = request.get_json()
-    new_allergies = data.get("allergies", [])
+    raw_allergies = data.get("allergies", [])
 
-    if not new_allergies:
-        return jsonify({"message": "No allergies provided"}), 400
+    if not raw_allergies or not isinstance(raw_allergies, list):
+        return jsonify({"message": "Invalid allergy list."}), 400
+
+    sanitized = list(set(
+        a.strip().lower()
+        for a in raw_allergies
+        if isinstance(a, str) and is_valid_allergen(a)
+    ))
+
+    if not sanitized:
+        return jsonify({"message": "No valid allergies provided."}), 400
 
     user = User.query.get(user_id)
     if not user:
-        return jsonify({"message": "User not found"}), 404
+        return jsonify({"message": "User not found."}), 404
 
     added = []
-    for allergy in new_allergies:
+    for allergy in sanitized:
         if allergy not in user.allergies:
             user.allergies.append(allergy)
             added.append(allergy)
 
     db.session.commit()
-    return jsonify({"message": "Batch allergies added", "added": added}), 200
+    return jsonify({
+        "message": "Valid allergies added successfully.",
+        "added": added
+    }), 200
