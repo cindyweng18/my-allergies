@@ -161,27 +161,31 @@ def add_batch_allergies():
     if not raw_allergies or not isinstance(raw_allergies, list):
         return jsonify({"message": "Invalid allergy list."}), 400
 
-    sanitized = list(set(
-        a.strip().lower()
-        for a in raw_allergies
-        if isinstance(a, str) and is_valid_allergen(a)
-    ))
-
-    if not sanitized:
-        return jsonify({"message": "No valid allergies provided."}), 400
-
     user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "User not found."}), 404
 
     added = []
-    for allergy in sanitized:
-        if allergy not in user.allergies:
-            user.allergies.append(allergy)
-            added.append(allergy)
+    rejected = []
+
+    for entry in raw_allergies:
+        if not isinstance(entry, str):
+            rejected.append(str(entry))
+            continue
+
+        cleaned = entry.strip().lower()
+        if not is_valid_allergen(cleaned):
+            rejected.append(entry)
+            continue
+
+        if cleaned not in user.allergies:
+            user.allergies.append(cleaned)
+            added.append(cleaned)
 
     db.session.commit()
+
     return jsonify({
-        "message": "Valid allergies added successfully.",
-        "added": added
+        "message": "Processed allergy list.",
+        "added": added,
+        "rejected": rejected
     }), 200
