@@ -1,8 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
 import secrets
 from datetime import datetime, timedelta
-from extensions import db, bcrypt
+from extensions import db
 from flask_login import UserMixin
 from sqlalchemy.schema import UniqueConstraint
 from werkzeug.security import generate_password_hash, check_password_hash

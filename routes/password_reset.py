@@ -2,8 +2,8 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash
 from itsdangerous import SignatureExpired, BadSignature
 from extensions import mail, get_serializer
 from flask_mail import Message
-from models.database import User, db
-
+from models.database import User
+from extensions import db
 
 password_reset = Blueprint("password_reset", __name__)
 

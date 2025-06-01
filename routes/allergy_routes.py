@@ -1,14 +1,11 @@
 import os, re
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from werkzeug.utils import secure_filename
-from models.database import db, Allergy
+from models.database import Allergy
 from utils.pdf_processing import extract_text_from_pdf, extract_allergens
-from utils.image_processing import extract_text_from_image
 from utils.ai_processing import extract_allergens, check_product_safety
 from models.database import User
 from extensions import db
-
 
 allergy_bp = Blueprint("allergy", __name__)
 
@@ -143,13 +140,6 @@ def save_selected_allergies():
 
     db.session.commit()
     return jsonify({"message": "Allergies saved successfully."}), 200
-
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from models.database import User
-from extensions import db
-
-allergy_bp = Blueprint("allergy", __name__)
 
 @allergy_bp.route("/add_batch", methods=["POST"])
 @jwt_required()
