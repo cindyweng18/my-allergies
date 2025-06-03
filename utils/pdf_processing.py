@@ -19,6 +19,7 @@ def extract_text_from_pdf(pdf_path):
     return text
 
 def extract_allergens(text):
+    """ Extract possible allergens from PDF upload converted to text using keywords to determine. """
     lines = text.splitlines()
     allergens = set()
 
