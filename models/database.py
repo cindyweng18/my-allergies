@@ -35,3 +35,7 @@ class Allergy(db.Model):
     name = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name="fk_allergy_user_id"), nullable=False)
     user = db.relationship('User', backref=db.backref('allergies', lazy=True))
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'name', name='uq_user_allergy'),
+    )
