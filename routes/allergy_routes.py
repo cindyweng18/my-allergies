@@ -35,16 +35,18 @@ def add_allergy():
     data = request.get_json()
     allergy_name = data.get("allergy", "").strip().lower()
 
-    if not allergy_name:
-        return jsonify({"error": "Missing allergy name"}), 400
+    if not allergy_name or not re.match(r'^[a-zA-Z\s\-]+$', allergy_name):
+        return jsonify({"message": "Invalid allergy name"}), 400
 
-    exists = Allergy.query.filter_by(name=allergy_name, user_id=user_id).first()
-    if exists:
-        return jsonify({"message": "Allergy already exists"}), 400
+    existing = Allergy.query.filter_by(user_id=user_id, name=allergy_name).first()
+    if existing:
+        return jsonify({"message": "Allergy already exists"}), 409
 
-    db.session.add(Allergy(name=allergy_name, user_id=user_id))
+    new_allergy = Allergy(name=allergy_name, user_id=user_id)
+    db.session.add(new_allergy)
     db.session.commit()
-    return jsonify({"message": "Allergy added successfully"}), 201
+
+    return jsonify({"message": "Allergy added successfully"}), 200
 
 @allergy_bp.route("/edit", methods=["PUT"])
 @jwt_required()
@@ -146,36 +148,20 @@ def save_selected_allergies():
 def add_batch_allergies():
     user_id = get_jwt_identity()
     data = request.get_json()
-    raw_allergies = data.get("allergies", [])
+    allergy_list = data.get("allergies", [])
 
-    if not raw_allergies or not isinstance(raw_allergies, list):
-        return jsonify({"message": "Invalid allergy list."}), 400
+    if not isinstance(allergy_list, list) or not allergy_list:
+        return jsonify({"message": "No valid allergy list provided"}), 400
 
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"message": "User not found."}), 404
+    # Get existing allergy names for this user
+    existing = {a.name for a in Allergy.query.filter_by(user_id=user_id).all()}
 
     added = []
-    rejected = []
-
-    for entry in raw_allergies:
-        if not isinstance(entry, str):
-            rejected.append(str(entry))
-            continue
-
-        cleaned = entry.strip().lower()
-        if not is_valid_allergen(cleaned):
-            rejected.append(entry)
-            continue
-
-        if cleaned not in user.allergies:
-            user.allergies.append(cleaned)
-            added.append(cleaned)
+    for name in allergy_list:
+        normalized = name.strip().lower()
+        if normalized and normalized not in existing:
+            db.session.add(Allergy(name=normalized, user_id=user_id))
+            added.append(normalized)
 
     db.session.commit()
-
-    return jsonify({
-        "message": "Processed allergy list.",
-        "added": added,
-        "rejected": rejected
-    }), 200
+    return jsonify({"message": f"Added {len(added)} new allergies.", "added": added}), 200
