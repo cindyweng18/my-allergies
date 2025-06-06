@@ -36,6 +36,7 @@ const AllergyChecker = (props) => {
   const [editedValue, setEditedValue] = useState("");
   const [uploadAllergens, setUploadAllergens] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [newAllergy, setNewAllergy] = useState("");
 
   useEffect(() => {
     const fetchAllergies = async () => {
@@ -88,47 +89,74 @@ const AllergyChecker = (props) => {
     }
   };
 
+  const handleAddAllergy = async () => {
+    const trimmed = newAllergy.trim().toLowerCase();
+    if (!trimmed) return;
+
+    if (allergies.includes(trimmed)) {
+      showSnackbar("Allergy already exists", "warning");
+      return;
+    }
+
+    try {
+      await axios.post("http://127.0.0.1:5000/allergy/add", {
+        allergy: trimmed,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      setAllergies((prev) => [...prev, trimmed]);
+      setNewAllergy("");
+      showSnackbar("Allergy added!");
+    } catch {
+      showSnackbar("Failed to add allergy", "error");
+    }
+  };
+
   const handleFileUpload = async (e) => {
-  e.preventDefault();
-  if (!file) return;
+    e.preventDefault();
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-  try {
-    const response = await axios.post("http://127.0.0.1:5000/allergy/upload", formData, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/allergy/upload", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    setUploadAllergens(response.data.allergens);
-    setModalOpen(true);
-  } catch {
-    showSnackbar("Failed to upload file.", "error");
-  }
-};
+      setUploadAllergens(response.data.allergens);
+      setModalOpen(true);
+    } catch {
+      showSnackbar("Failed to upload file.", "error");
+    }
+  };
 
-const handleConfirmAllergens = async (selectedAllergens) => {
-  try {
-    await axios.post("http://127.0.0.1:5000/allergy/add_batch", {
-      allergies: selectedAllergens
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-    });
-    setAllergies((prev) => [...prev, ...selectedAllergens]);
-    showSnackbar("Selected allergies added!");
-  } catch {
-    showSnackbar("Error saving selected allergens.", "error");
-  } finally {
-    setModalOpen(false);
-    setUploadAllergens([]);
-  }
-};
+  const handleConfirmAllergens = async (selectedAllergens) => {
+    try {
+      await axios.post("http://127.0.0.1:5000/allergy/add_batch", {
+        allergies: selectedAllergens
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setAllergies((prev) => [...prev, ...selectedAllergens]);
+      showSnackbar("Selected allergies added!");
+    } catch {
+      showSnackbar("Error saving selected allergens.", "error");
+    } finally {
+      setModalOpen(false);
+      setUploadAllergens([]);
+    }
+  };
 
   const filteredAllergies = allergies.filter((a) =>
     a.toLowerCase().includes(searchTerm.toLowerCase())
@@ -164,6 +192,25 @@ const handleConfirmAllergens = async (selectedAllergens) => {
                     )
                   }}
                 />
+                <TextField
+                  label="Add a new allergy"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  sx={{ my: 1 }}
+                  value={newAllergy}
+                  onChange={(e) => setNewAllergy(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddAllergy()}
+                />
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleAddAllergy}
+                  disabled={!newAllergy.trim()}
+                  sx={{ mb: 2 }}
+                >
+                  Add Allergy
+                </Button>
                 {filteredAllergies.length > 0 ? (
                   <List dense>
                     {filteredAllergies.map((a, idx) => (
