@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, CssBaseline, Typography, Paper } from "@mui/material";
 import AppTheme from "../theme";
-import SideMenu from "../components/SideMenu";
-import Navbar from "../components/Navbar";
+import SideMenu from "../pages/SideMenu";
+import Navbar from "../pages/Navbar";
 
 export default function AboutPage(props) {
   return (

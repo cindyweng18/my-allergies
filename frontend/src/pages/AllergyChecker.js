@@ -37,6 +37,7 @@ const AllergyChecker = (props) => {
   const [uploadAllergens, setUploadAllergens] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [newAllergy, setNewAllergy] = useState("");
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     const fetchAllergies = async () => {
@@ -210,6 +211,33 @@ const AllergyChecker = (props) => {
                   sx={{ mb: 2 }}
                 >
                   Add Allergy
+                </Button>
+                <Divider sx={{ my: 2 }} />
+
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>Upload Allergy Report</Typography>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  size="small"
+                >
+                  Choose File
+                  <input
+                    type="file"
+                    hidden
+                    accept=".pdf"
+                    onChange={(e) => setFile(e.target.files[0])}
+                  />
+                </Button>
+
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  onClick={handleFileUpload}
+                  disabled={!file}
+                  sx={{ ml: 2 }}
+                >
+                  Upload
                 </Button>
                 {filteredAllergies.length > 0 ? (
                   <List dense>
