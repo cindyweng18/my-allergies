@@ -38,6 +38,10 @@ const AllergyChecker = (props) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [newAllergy, setNewAllergy] = useState("");
   const [file, setFile] = useState(null);
+  const [productName, setProductName] = useState("");
+  const [productCheckResult, setProductCheckResult] = useState("");
+  const [checkingProduct, setCheckingProduct] = useState(false);
+
 
   useEffect(() => {
     const fetchAllergies = async () => {
@@ -163,6 +167,27 @@ const AllergyChecker = (props) => {
     a.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleCheckProduct = async () => {
+  if (!productName.trim()) return;
+  setCheckingProduct(true);
+  try {
+    const response = await axios.post("http://127.0.0.1:5000/allergy/check_product", {
+      product_name: productName.trim(),
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    setProductCheckResult(response.data.message);
+  } catch (err) {
+    setProductCheckResult("Failed to check product safety.");
+  } finally {
+    setCheckingProduct(false);
+  }
+};
+
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
@@ -266,6 +291,31 @@ const AllergyChecker = (props) => {
                   </Typography>
                 )}
               </Paper>
+              <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
+              <Typography variant="h6">Check Product Safety</Typography>
+              <TextField
+                label="Enter product name"
+                variant="outlined"
+                size="small"
+                fullWidth
+                sx={{ my: 2 }}
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+              />
+              <Button
+                variant="contained"
+                onClick={handleCheckProduct}
+                disabled={!productName || checkingProduct}
+              >
+                {checkingProduct ? <CircularProgress size={20} color="inherit" /> : "Check"}
+              </Button>
+
+              {productCheckResult && (
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                  {productCheckResult}
+                </Typography>
+              )}
+            </Paper>
             </Grid>
           </Grid>
         </Box>
