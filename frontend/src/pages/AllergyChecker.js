@@ -4,6 +4,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   CssBaseline,
   Grid,
   List,
@@ -197,9 +198,8 @@ const AllergyChecker = (props) => {
         <Box component="main" sx={{ flexGrow: 1, p: 4 }}>
           <Typography variant="h4" gutterBottom>Allergy Checker</Typography>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={6}>
               <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
-                <Typography variant="h6">Your Allergies</Typography>
                 <TextField
                   label="Search allergies"
                   variant="outlined"
@@ -264,6 +264,7 @@ const AllergyChecker = (props) => {
                 >
                   Upload
                 </Button>
+                <Typography variant="h6">Your Allergies</Typography>
                 {filteredAllergies.length > 0 ? (
                   <List dense>
                     {filteredAllergies.map((a, idx) => (
@@ -291,6 +292,8 @@ const AllergyChecker = (props) => {
                   </Typography>
                 )}
               </Paper>
+            </Grid>
+            <Grid item xs={12} md={6}>
               <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
               <Typography variant="h6">Check Product Safety</Typography>
               <TextField
