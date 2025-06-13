@@ -42,6 +42,9 @@ const AllergyChecker = (props) => {
   const [productName, setProductName] = useState("");
   const [productCheckResult, setProductCheckResult] = useState("");
   const [checkingProduct, setCheckingProduct] = useState(false);
+  const [productVerdict, setProductVerdict] = useState(null);
+  const [productExplanation, setProductExplanation] = useState("");
+  const [showExplanation, setShowExplanation] = useState(false);
 
 
   useEffect(() => {
@@ -169,25 +172,32 @@ const AllergyChecker = (props) => {
   );
 
   const handleCheckProduct = async () => {
-  if (!productName.trim()) return;
-  setCheckingProduct(true);
-  try {
-    const response = await axios.post("http://127.0.0.1:5000/allergy/check_product", {
-      product_name: productName.trim(),
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-    });
+    if (!productName.trim()) return;
 
-    setProductCheckResult(response.data.message);
-  } catch (err) {
-    setProductCheckResult("Failed to check product safety.");
-  } finally {
-    setCheckingProduct(false);
-  }
-};
+    setCheckingProduct(true);
+    setProductVerdict(null);
+    setProductExplanation("");
+    setShowExplanation(false);
+
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/allergy/check_product", {
+        product_name: productName
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      setProductVerdict(response.data.verdict);
+      setProductExplanation(response.data.explanation);
+    } catch {
+      showSnackbar("Failed to check product", "error");
+    } finally {
+      setCheckingProduct(false);
+    }
+  };
+
 
   return (
     <AppTheme {...props}>
@@ -313,11 +323,30 @@ const AllergyChecker = (props) => {
                 {checkingProduct ? <CircularProgress size={20} color="inherit" /> : "Check"}
               </Button>
 
-              {productCheckResult && (
-                <Typography variant="body2" sx={{ mt: 2 }}>
-                  {productCheckResult}
-                </Typography>
-              )}
+              {productVerdict && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle1">Verdict: {productVerdict}</Typography>
+
+                {productExplanation && (
+                  <>
+                    <Button
+                      size="small"
+                      variant="text"
+                      sx={{ mt: 1 }}
+                      onClick={() => setShowExplanation(prev => !prev)}
+                    >
+                      {showExplanation ? "Hide Explanation" : "Show Explanation"}
+                    </Button>
+
+                    {showExplanation && (
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        {productExplanation}
+                      </Typography>
+                    )}
+                  </>
+                )}
+              </Box>
+            )}
             </Paper>
             </Grid>
           </Grid>
