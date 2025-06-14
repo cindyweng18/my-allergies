@@ -210,24 +210,7 @@ const AllergyChecker = (props) => {
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
-                <TextField
-                  label="Search allergies"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ my: 2 }}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    endAdornment: searchTerm && (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setSearchTerm("")} edge="end">
-                          <ClearIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }}
-                />
+                <Typography variant="h6">Add an Allergy</Typography>
                 <TextField
                   label="Add a new allergy"
                   variant="outlined"
@@ -275,6 +258,24 @@ const AllergyChecker = (props) => {
                   Upload
                 </Button>
                 <Typography variant="h6">Your Allergies</Typography>
+                <TextField
+                  label="Search allergies"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  sx={{ my: 2 }}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    endAdornment: searchTerm && (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setSearchTerm("")} edge="end">
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
                 {filteredAllergies.length > 0 ? (
                   <List dense>
                     {filteredAllergies.map((a, idx) => (
