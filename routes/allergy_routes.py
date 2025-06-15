@@ -64,6 +64,20 @@ def edit_allergy():
     db.session.commit()
     return jsonify({"message": "Allergy updated"}), 200
 
+@allergy_bp.route("/<string:allergy_name>", methods=["DELETE"])
+@jwt_required()
+def delete_allergy(allergy_name):
+    user_id = get_jwt_identity()
+    normalized_name = allergy_name.strip().lower()
+
+    allergy = Allergy.query.filter_by(user_id=user_id, name=normalized_name).first()
+    if not allergy:
+        return jsonify({"message": "Allergy not found"}), 404
+
+    db.session.delete(allergy)
+    db.session.commit()
+    return jsonify({"message": f"Allergy '{normalized_name}' deleted."}), 200
+
 @allergy_bp.route("/delete_batch", methods=["POST"])
 @jwt_required()
 def delete_allergies():
@@ -153,7 +167,6 @@ def add_batch_allergies():
     if not isinstance(allergy_list, list) or not allergy_list:
         return jsonify({"message": "No valid allergy list provided"}), 400
 
-    # Get existing allergy names for this user
     existing = {a.name for a in Allergy.query.filter_by(user_id=user_id).all()}
 
     added = []
