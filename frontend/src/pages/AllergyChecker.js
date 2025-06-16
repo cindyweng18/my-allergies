@@ -45,6 +45,7 @@ const AllergyChecker = (props) => {
   const [productVerdict, setProductVerdict] = useState(null);
   const [productExplanation, setProductExplanation] = useState("");
   const [showExplanation, setShowExplanation] = useState(false);
+  const [lastDeleted, setLastDeleted] = useState(null);
 
 
   useEffect(() => {
@@ -122,6 +123,21 @@ const AllergyChecker = (props) => {
       showSnackbar("Allergy added!");
     } catch {
       showSnackbar("Failed to add allergy", "error");
+    }
+  };
+
+  const handleDeleteAllergy = async (name) => {
+    try {
+      await axios.delete(`http://127.0.0.1:5000/allergy/${encodeURIComponent(name)}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setLastDeleted(name);
+      setAllergies((prev) => prev.filter((a) => a !== name));
+      showSnackbar(`Deleted "${name}". Undo?`, "info");
+    } catch {
+      showSnackbar("Failed to delete allergy", "error");
     }
   };
 
@@ -281,6 +297,7 @@ const AllergyChecker = (props) => {
                     {filteredAllergies.map((a, idx) => (
                       <ListItem key={idx} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         {editingAllergy === a ? (
+                          <>
                           <TextField
                             value={editedValue}
                             onChange={(e) => setEditedValue(e.target.value)}
@@ -288,6 +305,13 @@ const AllergyChecker = (props) => {
                             sx={{ flexGrow: 1, mr: 1 }}
                             onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
                           />
+                          <IconButton
+                            edge="end"
+                            onClick={() => handleDeleteAllergy(a)}
+                          >
+                            <ClearIcon fontSize="small" />
+                          </IconButton>
+                          </>
                         ) : (
                           <Typography sx={{ flexGrow: 1 }}>{a.charAt(0).toUpperCase() + a.slice(1)}</Typography>
                         )}
