@@ -141,6 +141,25 @@ const AllergyChecker = (props) => {
     }
   };
 
+  const handleUndoDelete = async () => {
+    if (!lastDeleted) return;
+    try {
+      await axios.post("http://127.0.0.1:5000/allergy/", {
+        name: lastDeleted
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json"
+        },
+      });
+      setAllergies((prev) => [...prev, lastDeleted]);
+      setLastDeleted(null);
+      showSnackbar("Allergy restored.");
+    } catch {
+      showSnackbar("Failed to undo delete.", "error");
+    }
+  };
+
   const handleFileUpload = async (e) => {
     e.preventDefault();
     if (!file) return;
@@ -377,11 +396,28 @@ const AllergyChecker = (props) => {
           </Grid>
         </Box>
       </Box>
-      <Snackbar open={snackbarOpen} autoHideDuration={4000} onClose={() => setSnackbarOpen(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+          action={
+            lastDeleted && (
+              <Button color="inherit" size="small" onClick={handleUndoDelete}>
+                UNDO
+              </Button>
+            )
+          }
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
 
       <SelectAllergens
         open={modalOpen}
